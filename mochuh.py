@@ -81,4 +81,22 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
+@bot.event
+async def on_ready():
+    Channel = bot.get_channel(1024728422724943893)
+    Text= "тыкать сюда."
+    Moji = await Channel.send(Text)
+    await Moji.add_reaction('🏖')
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    Channel = bot.get_channel(1024728422724943893)
+    if reaction.message.channel.id != Channel.id:
+        return
+    if reaction.emoji == "🏖":
+      Role = discord.utils.get(user.guild.roles, name="🏖")
+      await user.add_roles(Role)
+
+
 bot.run(token)
