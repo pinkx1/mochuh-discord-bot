@@ -106,6 +106,8 @@ async def bump(ctx):
     cookie = os.getenv('cookie')
     boundary = os.getenv('boundary')
     usercode = os.getenv('usercode')
+    thread_link = os.getenv('thread_link')
+    thread_id = os.getenv('thread_id')
     
     dataList = []
     dataList.append(encode('--' + boundary))
@@ -128,7 +130,7 @@ async def bump(ctx):
     dataList.append(encode('Content-Type: {}'.format('text/plain')))
     dataList.append(encode(''))
 
-    dataList.append(encode("216992"))
+    dataList.append(encode(thread_id))
     dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=usercode;'))
 
@@ -169,7 +171,7 @@ async def bump(ctx):
     'x-requested-with': 'XMLHttpRequest',
     'sec-fetch-site': 'same-origin',
     'sec-fetch-mode': 'cors',
-    'referer': 'https://2ch.hk/ch/res/216992.html',
+    'referer': thread_link,
     'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
     'cookie': cookie,
     'origin': 'https://2ch.hk',
@@ -180,10 +182,8 @@ async def bump(ctx):
     data = res.read()
     print(data.decode("utf-8"))
 
-    # pepeEZ = bot.get_emoji(1032917084906192977)
-    # await ctx.send('Бампнул тредю ' + pepeEZ)
-    # get(bot.get_all_emojis(), id='1032917084906192977')
-    emoji = discord.utils.get(bot.emojis, name='EZ')
-    await ctx.send(str(emoji))
 
+    emoji = discord.utils.get(bot.emojis, name='EZ')
+    await ctx.send('Бампнул тредю ' + str(emoji))
+    
 bot.run(token)
