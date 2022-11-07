@@ -5,6 +5,12 @@ import requests
 from discord.ext import commands
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
+from email import message
+from inspect import getcomments
+from time import sleep
+import time
+import requests, re
+
 
 load_dotenv()
 token = os.getenv('token')
@@ -92,6 +98,27 @@ async def on_reaction_add(reaction, user):
     if reaction.emoji == "🏖":
       Role = discord.utils.get(user.guild.roles, name="🏖")
       await user.add_roles(Role)
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    if str(message.author.roles).find('1016367823490134027') != -1:
+        await message.add_reaction('💩')
+
+    if message.attachments != []:
+        await message.add_reaction('💖')
+        sleep(0.1)
+        await message.add_reaction('👍')
+        sleep(0.1)
+        await message.add_reaction('👎')
+    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636:
+        await message.add_reaction('💖')
+        sleep(0.1)
+        await message.add_reaction('👍')
+        sleep(0.1)
+        await message.add_reaction('👎')
 
 
 @commands.has_permissions(administrator=True)
