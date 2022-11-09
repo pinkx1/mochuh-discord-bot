@@ -1,30 +1,22 @@
 import random
 import os
 import discord
-import requests
+# import requests, re
 from discord.ext import commands
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
-import time
-import requests, re
 
 
 load_dotenv()
 token = os.getenv('token')
 
-
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
 
 
-# To avoid logging such messages like:
-# discord.ext.commands.errors.CommandNotFound: Command + is not found
-# We use command_prefix as '!'.
-# In addition to this one we would not log such events even for the commands like: ping
-# In case if the ping command does not exist.
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
@@ -45,7 +37,6 @@ async def say(ctx, *, arg):
     await ctx.send(arg)
 
 
-
 @slash.slash(description="Лобби SiGame")
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
@@ -62,7 +53,7 @@ async def coinflip(ctx):
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(973593062045548636)  # channel_id of the channel you want the message to be displayed
+    channel = bot.get_channel(973593062045548636)
     await channel.send(f"{member.mention} проскальзывает на сервер! Ласкаво просимо!")
 
 
@@ -72,12 +63,29 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if message.content.lower() in ( "да", "дa"):
+    if message.content.lower() in ("да", "дa"):
         await message.channel.send(content='пизда')
 
     if message.content.lower() == "нет":
         await message.channel.send(content='пидора ответ')
 
+    if message.author == bot.user:
+        return
+    if str(message.author.roles).find('1016367823490134027') != -1:
+        await message.add_reaction('💩')
+
+    if message.attachments != [] and message.channel.id != 973593062045548636:
+        await message.add_reaction('💖')
+        sleep(0.1)
+        await message.add_reaction('👍')
+        sleep(0.1)
+        await message.add_reaction('👎')
+    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636:
+        await message.add_reaction('💖')
+        sleep(0.1)
+        await message.add_reaction('👍')
+        sleep(0.1)
+        await message.add_reaction('👎')
 
     await bot.process_commands(message)
 
@@ -87,12 +95,16 @@ async def on_raw_reaction_add(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) #если чето не так, заменить на client.guilds
+        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
         elif payload.emoji.name == 'dota2':
             role = discord.utils.get(guild.roles, name='Dota 2')
+        elif payload.emoji.name == 'leagueoflegends':
+            role = discord.utils.get(guild.roles, name='League of Legends')
+        elif payload.emoji.name == 'wow':
+            role = discord.utils.get(guild.roles, name='World of Warcraft')
         else:
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
@@ -112,12 +124,16 @@ async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) #если чето не так, заменить на client.guilds
+        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
         elif payload.emoji.name == 'dota2':
             role = discord.utils.get(guild.roles, name='Dota 2')
+        elif payload.emoji.name == 'leagueoflegends':
+            role = discord.utils.get(guild.roles, name='League of Legends')
+        elif payload.emoji.name == 'wow':
+            role = discord.utils.get(guild.roles, name='World of Warcraft')
         else:
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
@@ -130,26 +146,6 @@ async def on_raw_reaction_remove(payload):
                 print('Member not found.')
         else:
             print('Role not found.')
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-    if str(message.author.roles).find('1016367823490134027') != -1:
-        await message.add_reaction('💩')
-
-    if message.attachments != []:
-        await message.add_reaction('💖')
-        sleep(0.1)
-        await message.add_reaction('👍')
-        sleep(0.1)
-        await message.add_reaction('👎')
-    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636:
-        await message.add_reaction('💖')
-        sleep(0.1)
-        await message.add_reaction('👍')
-        sleep(0.1)
-        await message.add_reaction('👎')
 
 
 @commands.has_permissions(administrator=True)
@@ -222,18 +218,18 @@ async def bump(ctx):
     body = b'\r\n'.join(dataList)
     payload = body
     headers = {
-    'scheme': 'https',
-    'path': '/user/posting?nc=1',
-    'method': 'POST',
-    'authority': '2ch.hk',
-    'x-requested-with': 'XMLHttpRequest',
-    'sec-fetch-site': 'same-origin',
-    'sec-fetch-mode': 'cors',
-    'referer': thread_link,
-    'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
-    'cookie': cookie,
-    'origin': 'https://2ch.hk',
-    'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
+        'scheme': 'https',
+        'path': '/user/posting?nc=1',
+        'method': 'POST',
+        'authority': '2ch.hk',
+        'x-requested-with': 'XMLHttpRequest',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'cors',
+        'referer': thread_link,
+        'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
+        'cookie': cookie,
+        'origin': 'https://2ch.hk',
+        'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
     }
     conn.request("POST", "/user/posting?nc=1", payload, headers)
     res = conn.getresponse()
