@@ -1,7 +1,6 @@
 import random
 import os
 import discord
-# import requests, re
 from discord.ext import commands
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
