@@ -58,28 +58,36 @@ async def on_member_join(member):
 
 @bot.event
 async def on_message(message):
-    # Skip reaction to bot's messages
     if message.author == bot.user:
         return
 
-    if message.content.lower() in ("да", "дa"):
-        await message.channel.send(content='пизда')
+    if message.content.lower() in ("да", "дa", "da", "dа"):
+        chance = random.randint(1,4)
+        if chance == 1:
+            await message.channel.send(content='пизда')
 
     if message.content.lower() == "нет":
-        await message.channel.send(content='пидора ответ')
+        chance = random.randint(1,4)
+        if chance == 1:
+            await message.channel.send(content='пидора ответ')
+
+    if message.content.lower() == ("300", "триста"):
+        chance = random.randint(1,4)
+        if chance == 1:
+          await message.channel.send(content='отсоси у тракториста')
 
     if message.author == bot.user:
         return
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    if message.attachments != [] and message.channel.id != 973593062045548636:
+    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
-    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636:
+    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
@@ -240,3 +248,5 @@ async def bump(ctx):
     await ctx.send('Бампнул тредю ' + str(emoji))
     
 bot.run(token)
+
+
