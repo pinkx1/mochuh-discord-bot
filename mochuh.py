@@ -31,7 +31,7 @@ announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=10
 nitro_booster = 1033058782319742977
 kabanchiki = 1040533421908299838
 lvl = DiscordLevelingSystem(awards=my_awards, level_up_announcement=announcement, no_xp_channels=1034698950369874010, announce_level_up=True, stack_awards=False, )
-lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
+lvl.connect_to_database_file(r'/home/ec2-user/github/mochuh-discord-bot')
 
 
 @bot.event

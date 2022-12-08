@@ -3,3 +3,5 @@
 
 # Ignore token file
 .env
+
+DiscordLevelingSystem.db
