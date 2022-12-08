@@ -2,7 +2,6 @@ import random
 import os
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
@@ -14,7 +13,6 @@ load_dotenv()
 token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-slash = SlashCommand(bot, sync_commands=True)
 
 
 main_guild_id = 1050324651034824784
@@ -31,7 +29,7 @@ announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=10
 nitro_booster = 1033058782319742977
 kabanchiki = 1040533421908299838
 lvl = DiscordLevelingSystem(awards=my_awards, level_up_announcement=announcement, no_xp_channels=1034698950369874010, announce_level_up=True, stack_awards=False, )
-lvl.connect_to_database_file(r'/home/ec2-user/github/mochuh-discord-bot')
+lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
 
 
 @bot.event
@@ -64,7 +62,7 @@ async def leaderboard(ctx):
     data = await lvl.each_member_data(ctx.guild, sort_by='rank')
 
 
-@bot.command(aliases=['не'])
+@bot.command(aliases=['не срать'])
 async def nesrat(ctx):
     await ctx.channel.purge(limit = 1)
     emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
@@ -73,7 +71,7 @@ async def nesrat(ctx):
 bot.run(token)
 
 
-@slash.slash(description="Лобби SiGame")
+@bot.command(aliases=['своя игра'])
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
                                     'Онлайн: <https://vladimirkhil.com/si/online/>\n'
@@ -82,7 +80,7 @@ async def sigame(ctx):
                                     file=discord.File('./sigame.png'))
 
 
-@slash.slash(description="Бросить монетку")
+@bot.command(aliases=['бросить монетку'])
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
 
@@ -131,9 +129,9 @@ async def on_message(message):
         sleep(0.1)
         await message.add_reaction('👎')
 
-    await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki], 20, multiply=False))
-
     await bot.process_commands(message)
+
+    await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki], 20, multiply=False))
 
 
 @bot.event
@@ -288,3 +286,5 @@ async def bump(ctx):
 
 
 bot.run(token)
+
+
