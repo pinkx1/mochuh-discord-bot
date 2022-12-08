@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
+from discordLevelingSystem import DiscordLevelingSystem, LevelUpAnnouncement, RoleAward
 
 
 load_dotenv()
@@ -14,6 +15,23 @@ token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
+
+
+main_guild_id = 1050324651034824784
+
+my_awards = {
+    main_guild_id : [
+        RoleAward(role_id=1050323843169919016, level_requirement=1, role_name='Тестовая роль 1'), #установить айди роли и имя роли
+        RoleAward(role_id=1047144673979924601, level_requirement=2, role_name='Тестовая роль 2'), #установить айди роли и имя роли
+        RoleAward(role_id=1050323952410566686, level_requirement=3, role_name='Тестовая роль 3') #установить айди роли и имя роли
+    ]
+}
+lvlupmessage = f'{LevelUpAnnouncement.Member.mention} апнул уровень {LevelUpAnnouncement.LEVEL} 😎' #придумать текст лвлапа
+announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=1034698950369874010) 
+nitro_booster = 1033058782319742977
+kabanchiki = 1040533421908299838
+lvl = DiscordLevelingSystem(awards=my_awards, level_up_announcement=announcement, no_xp_channels=1034698950369874010, announce_level_up=True, stack_awards=False, )
+lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
 
 
 @bot.event
@@ -34,6 +52,25 @@ async def on_ready():
 async def say(ctx, *, arg):
     await ctx.channel.purge(limit = 1)
     await ctx.send(arg)
+
+
+@bot.command(aliases=['ранг'])
+async def rank(ctx):
+    data = await lvl.get_data_for(ctx.author)
+    await ctx.send(f'У тебя уровень {data.level} и твой ранг {data.rank}')
+
+@bot.command(aliases=['лидерборд'])
+async def leaderboard(ctx):
+    data = await lvl.each_member_data(ctx.guild, sort_by='rank')
+
+
+@bot.command(aliases=['не'])
+async def nesrat(ctx):
+    await ctx.channel.purge(limit = 1)
+    emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
+    emoji3 = discord.utils.get(bot.emojis, name='nonono')
+    await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
+bot.run(token)
 
 
 @slash.slash(description="Лобби SiGame")
@@ -93,6 +130,8 @@ async def on_message(message):
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
+
+    await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki], 20, multiply=False))
 
     await bot.process_commands(message)
 
@@ -246,7 +285,6 @@ async def bump(ctx):
 
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
-    
+
+
 bot.run(token)
-
-
