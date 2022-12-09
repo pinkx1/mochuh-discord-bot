@@ -32,18 +32,12 @@ lvlupmessage = f'{LevelUpAnnouncement.Member.mention} апнул уровень 
 announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=(1034698950369874010,))
 nitro_booster = 1033058782319742977
 kabanchiki = 1040533421908299838
-
-lvl = DiscordLevelingSystem(awards=my_awards, level_up_announcement=announcement, no_xp_channels=1034698950369874010, announce_level_up=True, stack_awards=False, )
-lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
-
-
 mirnyak = 1050749022111010877
 lvl = DiscordLevelingSystem(rate=5000000,awards=my_awards, level_up_announcement=announcement, no_xp_channels=(1034698950369874010,),
                             announce_level_up=True, stack_awards=False, )
 #lvl.create_database_file('/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
 lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
 print('connected to db')
-
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -145,7 +139,6 @@ async def on_message(message):
         await message.add_reaction('👎')
 
     await lvl.award_xp(amount=20, message=message, level_up_channel_ids=1034698950369874010, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki, mirnyak], 20, multiply=False))
-
     await bot.process_commands(message)
 
 @bot.event

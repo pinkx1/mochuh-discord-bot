@@ -1,0 +1,16 @@
+LICENSE
+README.md
+setup.py
+discordLevelingSystem/__init__.py
+discordLevelingSystem/announcement.py
+discordLevelingSystem/decorators.py
+discordLevelingSystem/errors.py
+discordLevelingSystem/leveling_system.py
+discordLevelingSystem/levels_xp_needed.py
+discordLevelingSystem/member_data.py
+discordLevelingSystem/role_awards.py
+discordLevelingSystem.egg-info/PKG-INFO
+discordLevelingSystem.egg-info/SOURCES.txt
+discordLevelingSystem.egg-info/dependency_links.txt
+discordLevelingSystem.egg-info/requires.txt
+discordLevelingSystem.egg-info/top_level.txt
