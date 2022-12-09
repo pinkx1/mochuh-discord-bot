@@ -2,36 +2,47 @@ import random
 import os
 import discord
 from discord.ext import commands
-from discord_slash import SlashCommand
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
 from discordLevelingSystem import DiscordLevelingSystem, LevelUpAnnouncement, RoleAward
 
-
 load_dotenv()
 token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-slash = SlashCommand(bot, sync_commands=True)
 
+main_guild_id = 1050324651034824784 # OLD
 
-main_guild_id = 1050324651034824784
+test = 973593060992753695
+johns_server = 973593060992753695
 
 my_awards = {
-    main_guild_id : [
-        RoleAward(role_id=1050323843169919016, level_requirement=1, role_name='Тестовая роль 1'), #установить айди роли и имя роли
-        RoleAward(role_id=1047144673979924601, level_requirement=2, role_name='Тестовая роль 2'), #установить айди роли и имя роли
-        RoleAward(role_id=1050323952410566686, level_requirement=3, role_name='Тестовая роль 3') #установить айди роли и имя роли
+    johns_server : [
+        RoleAward(role_id=1050323843169919016, level_requirement=10, role_name='Маслёнок'),
+        RoleAward(role_id=1047144673979924601, level_requirement=20, role_name='Булочка'),
+        RoleAward(role_id=1050323952410566686, level_requirement=30, role_name='Крутой в интернете')
     ]
+
 }
-lvlupmessage = f'{LevelUpAnnouncement.Member.mention} апнул уровень {LevelUpAnnouncement.LEVEL} 😎' #придумать текст лвлапа
-announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=1034698950369874010) 
+
+
+lvlupmessage = f'{LevelUpAnnouncement.Member.mention} апнул уровень {LevelUpAnnouncement.LEVEL} 😎'  # придумать текст лвлапа
+announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=(1034698950369874010,))
 nitro_booster = 1033058782319742977
 kabanchiki = 1040533421908299838
+
 lvl = DiscordLevelingSystem(awards=my_awards, level_up_announcement=announcement, no_xp_channels=1034698950369874010, announce_level_up=True, stack_awards=False, )
 lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
+
+
+mirnyak = 1050749022111010877
+lvl = DiscordLevelingSystem(rate=5000000,awards=my_awards, level_up_announcement=announcement, no_xp_channels=(1034698950369874010,),
+                            announce_level_up=True, stack_awards=False, )
+#lvl.create_database_file('/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
+lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
+print('connected to db')
 
 
 @bot.event
@@ -40,17 +51,17 @@ async def on_command_error(ctx, error):
         return
     raise error
 
-
 @bot.event
 async def on_ready():
     print('bot connected')
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
 
 
 @commands.has_permissions(administrator=True)
 @bot.command()
 async def say(ctx, *, arg):
-    await ctx.channel.purge(limit = 1)
+    await ctx.channel.purge(limit=1)
     await ctx.send(arg)
 
 
@@ -59,30 +70,32 @@ async def rank(ctx):
     data = await lvl.get_data_for(ctx.author)
     await ctx.send(f'У тебя уровень {data.level} и твой ранг {data.rank}')
 
+
 @bot.command(aliases=['лидерборд'])
 async def leaderboard(ctx):
     data = await lvl.each_member_data(ctx.guild, sort_by='rank')
+    for each in data:
+        await ctx.send(f'Ранг {each.rank} у {each.name}')
 
 
 @bot.command(aliases=['не'])
 async def nesrat(ctx):
-    await ctx.channel.purge(limit = 1)
+    await ctx.channel.purge(limit=1)
     emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji3 = discord.utils.get(bot.emojis, name='nonono')
     await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
-bot.run(token)
 
 
-@slash.slash(description="Лобби SiGame")
+@bot.command(aliases=['своя'])
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
-                                    'Онлайн: <https://vladimirkhil.com/si/online/>\n'
-                                    'Название лобби: gay123\n'
-                                    'Пароль: 1099\n',
-                                    file=discord.File('./sigame.png'))
+                   'Онлайн: <https://vladimirkhil.com/si/online/>\n'
+                   'Название лобби: gay123\n'
+                   'Пароль: 1099\n',
+                   file=discord.File('./sigame.png'))
 
 
-@slash.slash(description="Бросить монетку")
+@bot.command(aliases=['бросить'])
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
 
@@ -92,26 +105,25 @@ async def on_member_join(member):
     channel = bot.get_channel(973593062045548636)
     await channel.send(f"{member.mention} проскальзывает на сервер! Ласкаво просимо!")
 
-
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
     if message.content.lower() in ("да", "дa", "da", "dа"):
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
             await message.channel.send(content='пизда')
 
     if message.content.lower() == "нет":
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
             await message.channel.send(content='пидора ответ')
 
     if message.content.lower() == ("300", "триста"):
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
-          await message.channel.send(content='отсоси у тракториста')
+            await message.channel.send(content='отсоси у тракториста')
 
     if message.author == bot.user:
         return
@@ -124,24 +136,24 @@ async def on_message(message):
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
-    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
+    if str(message.content).rfind(
+            "https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
 
-    await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki], 20, multiply=False))
+    await lvl.award_xp(amount=20, message=message, level_up_channel_ids=1034698950369874010, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki, mirnyak], 20, multiply=False))
 
     await bot.process_commands(message)
-
 
 @bot.event
 async def on_raw_reaction_add(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
+        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -155,7 +167,7 @@ async def on_raw_reaction_add(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.add_roles(role)
                 print('done')
@@ -170,7 +182,7 @@ async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
+        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -184,7 +196,7 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.remove_roles(role)
                 print('done')
@@ -245,7 +257,7 @@ async def bump(ctx):
     dataList.append(encode(''))
 
     dataList.append(encode("2chcaptcha"))
-    dataList.append(encode('--' + boundary))
+        dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=formimages[];'))
 
     dataList.append(encode('Content-Type: {}'.format('text/plain')))
