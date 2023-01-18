@@ -103,6 +103,8 @@ async def on_member_join(member):
 async def on_message(message):
     if message.author == bot.user:
         return
+    elif message.author.id in "978650416977952808":
+        return
 
     if message.content.lower() in ("да", "дa", "da", "dа"):
         chance = random.randint(1, 4)
