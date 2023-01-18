@@ -213,7 +213,7 @@ async def bump(ctx):
     usercode = os.getenv('usercode')
     thread_link = os.getenv('thread_link')
     thread_id = os.getenv('thread_id')
-    
+
     dataList = []
     dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=task;'))
@@ -250,7 +250,7 @@ async def bump(ctx):
     dataList.append(encode(''))
 
     dataList.append(encode("2chcaptcha"))
-        dataList.append(encode('--' + boundary))
+    dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=formimages[];'))
 
     dataList.append(encode('Content-Type: {}'.format('text/plain')))
@@ -286,7 +286,6 @@ async def bump(ctx):
     res = conn.getresponse()
     data = res.read()
     print(data.decode("utf-8"))
-
 
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
