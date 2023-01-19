@@ -126,14 +126,14 @@ async def on_message(message):
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777:
+    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777 and message.channel.id != 1065638324380909649:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
     if str(message.content).rfind(
-            "https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777:
+            "https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777 and message.channel.id != 1065638324380909649:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
