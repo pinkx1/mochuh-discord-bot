@@ -6,38 +6,11 @@ from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
-from discordLevelingSystem import DiscordLevelingSystem, LevelUpAnnouncement, RoleAward
 
 load_dotenv()
 token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
-
-main_guild_id = 1050324651034824784 # OLD
-
-test = 973593060992753695
-johns_server = 973593060992753695
-
-my_awards = {
-    johns_server : [
-        RoleAward(role_id=1050323843169919016, level_requirement=10, role_name='Маслёнок'),
-        RoleAward(role_id=1047144673979924601, level_requirement=20, role_name='Булочка'),
-        RoleAward(role_id=1050323952410566686, level_requirement=30, role_name='Крутой в интернете')
-    ]
-
-}
-
-
-lvlupmessage = f'{LevelUpAnnouncement.Member.mention} апнул уровень {LevelUpAnnouncement.LEVEL} 😎'  # придумать текст лвлапа
-announcement = LevelUpAnnouncement(message=lvlupmessage, level_up_channel_ids=(1034698950369874010,))
-nitro_booster = 1033058782319742977
-kabanchiki = 1040533421908299838
-mirnyak = 1050749022111010877
-lvl = DiscordLevelingSystem(rate=5000000,awards=my_awards, level_up_announcement=announcement, no_xp_channels=(1034698950369874010,),
-                            announce_level_up=True, stack_awards=False, )
-#lvl.create_database_file('/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
-lvl.connect_to_database_file(r'/home/ec2-user/mochuh-bot/DiscordLevelingSystem.db')
-print('connected to db')
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -49,27 +22,12 @@ async def on_command_error(ctx, error):
 async def on_ready():
     print('bot connected')
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
-
 
 @commands.has_permissions(administrator=True)
 @bot.command()
 async def say(ctx, *, arg):
     await ctx.channel.purge(limit=1)
     await ctx.send(arg)
-
-
-@bot.command(aliases=['ранг'])
-async def rank(ctx):
-    data = await lvl.get_data_for(ctx.author)
-    await ctx.send(f'У тебя уровень {data.level} и твой ранг {data.rank}')
-
-
-@bot.command(aliases=['лидерборд'])
-async def leaderboard(ctx):
-    data = await lvl.each_member_data(ctx.guild, sort_by='rank')
-    for each in data:
-        await ctx.send(f'Ранг {each.rank} у {each.name}')
 
 
 @bot.command(aliases=['не'])
@@ -80,7 +38,7 @@ async def nesrat(ctx):
     await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
 
 
-@bot.command(aliases=['своя'])
+@bot.command(aliases=['свояк'])
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
                    'Онлайн: <https://vladimirkhil.com/si/online/>\n'
@@ -89,7 +47,7 @@ async def sigame(ctx):
                    file=discord.File('./sigame.png'))
 
 
-@bot.command(aliases=['бросить'])
+@bot.command(aliases=['монетка'])
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
 
