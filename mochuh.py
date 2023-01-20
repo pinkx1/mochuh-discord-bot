@@ -98,8 +98,6 @@ async def on_message(message):
         sleep(0.1)
         await message.add_reaction('👎')
 
-    await lvl.award_xp(amount=20, message=message, level_up_channel_ids=1034698950369874010, bonus=DiscordLevelingSystem.Bonus([nitro_booster, kabanchiki, mirnyak], 20, multiply=False))
-    await bot.process_commands(message)
 
 @bot.event
 async def on_raw_reaction_add(payload):
