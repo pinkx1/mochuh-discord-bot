@@ -2,15 +2,19 @@ import random
 import os
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
 
+
 load_dotenv()
 token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+slash = SlashCommand(bot, sync_commands=True)
+
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -18,36 +22,30 @@ async def on_command_error(ctx, error):
         return
     raise error
 
+
 @bot.event
 async def on_ready():
     print('bot connected')
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
 
+
 @commands.has_permissions(administrator=True)
 @bot.command()
 async def say(ctx, *, arg):
-    await ctx.channel.purge(limit=1)
+    await ctx.channel.purge(limit = 1)
     await ctx.send(arg)
 
 
-@bot.command(aliases=['не'])
-async def nesrat(ctx):
-    await ctx.channel.purge(limit=1)
-    emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
-    emoji3 = discord.utils.get(bot.emojis, name='nonono')
-    await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
-
-
-@bot.command(aliases=['свояк'])
+@slash.slash(description="Лобби SiGame")
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
-                   'Онлайн: <https://vladimirkhil.com/si/online/>\n'
-                   'Название лобби: gay123\n'
-                   'Пароль: 1099\n',
-                   file=discord.File('./sigame.png'))
+                                    'Онлайн: <https://vladimirkhil.com/si/online/>\n'
+                                    'Название лобби: gay123\n'
+                                    'Пароль: 1099\n',
+                                    file=discord.File('./sigame.png'))
 
 
-@bot.command(aliases=['монетка'])
+@slash.slash(description="Бросить монетку")
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
 
@@ -57,46 +55,46 @@ async def on_member_join(member):
     channel = bot.get_channel(973593062045548636)
     await channel.send(f"{member.mention} проскальзывает на сервер! Ласкаво просимо!")
 
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
-    elif message.author.id == 978650416977952808:
-        return
 
     if message.content.lower() in ("да", "дa", "da", "dа"):
-        chance = random.randint(1, 4)
+        chance = random.randint(1,4)
         if chance == 1:
             await message.channel.send(content='пизда')
 
     if message.content.lower() == "нет":
-        chance = random.randint(1, 4)
+        chance = random.randint(1,4)
         if chance == 1:
             await message.channel.send(content='пидора ответ')
 
     if message.content.lower() == ("300", "триста"):
-        chance = random.randint(1, 4)
+        chance = random.randint(1,4)
         if chance == 1:
-            await message.channel.send(content='отсоси у тракториста')
+          await message.channel.send(content='отсоси у тракториста')
 
     if message.author == bot.user:
         return
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777 and message.channel.id != 1065638324380909649:
+    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
-    if str(message.content).rfind(
-            "https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673 and message.channel.id != 1044239842680258731 and message.channel.id != 1061571232094502942 and message.channel.id != 1057994630731415582 and message.channel.id != 1034698950369874010 and message.channel.id != 1038853570159714464 and message.channel.id != 1020734141328797777 and message.channel.id != 1065638324380909649:
+    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
         sleep(0.1)
         await message.add_reaction('👍')
         sleep(0.1)
         await message.add_reaction('👎')
+
+    await bot.process_commands(message)
 
 
 @bot.event
@@ -104,7 +102,7 @@ async def on_raw_reaction_add(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
+        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -118,7 +116,7 @@ async def on_raw_reaction_add(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.add_roles(role)
                 print('done')
@@ -133,7 +131,7 @@ async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
+        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -147,7 +145,7 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.remove_roles(role)
                 print('done')
@@ -171,7 +169,7 @@ async def bump(ctx):
     usercode = os.getenv('usercode')
     thread_link = os.getenv('thread_link')
     thread_id = os.getenv('thread_id')
-
+    
     dataList = []
     dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=task;'))
@@ -245,8 +243,9 @@ async def bump(ctx):
     data = res.read()
     print(data.decode("utf-8"))
 
+
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
-
-
+    
 bot.run(token)
+
