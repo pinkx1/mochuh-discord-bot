@@ -9,6 +9,7 @@ from inspect import getcomments
 from time import sleep
 import asyncio
 import asyncpg
+from typing import List
 
 load_dotenv()
 token = os.getenv('token')
@@ -34,7 +35,36 @@ async def connect_to_db():
         print("Error while connecting to PostgreSQL", error)
 
 
+async def check_achievement(discord_id: int, message_count: int):
+    if message_count >= 1000:
+        # Проверяем, есть ли уже у пользователя эта ачивка
+        existing_achievement = await connection.fetchval("SELECT COUNT(*) FROM achievements WHERE discord_id = $1 AND achievement_name = 'Спейсователь'", discord_id)
 
+        # Если ачивки еще нет, добавляем ее
+        if existing_achievement == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) VALUES ($1, 'Спейсователь')", discord_id)
+            print(f"User with ID {discord_id} has earned the 'Спейсователь' achievement!")
+
+
+async def get_achievements(discord_id) -> List[str]:
+    query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
+    achievements = await connection.fetch(query, discord_id)
+    return [a["achievement_name"] for a in achievements]
+
+
+async def get_message_count(discord_id):
+    query = 'SELECT messages_count FROM users WHERE discord_id = $1'
+    result = await connection.fetchval(query, discord_id)
+    return result
+
+
+# async def view_achievements(user_id: int) -> str:
+#     query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
+#     achievements = await connection.fetch(query, user_id)
+#     if not achievements:
+#         return 'У тебя пока что нет ачивок'
+#     else:
+#         return 'Твои ачивки: ' + ', '.join([achievement_name['achievement'] for achievement_name in achievements])
 
 
 @bot.event
@@ -68,7 +98,7 @@ async def sigame(ctx):
                                     file=discord.File('./sigame.png'))
 
 
-@slash.slash(description="Количество моих сообщений")
+@slash.slash(description="Количество твоих сообщений")
 async def messages_count(ctx):
     user_id = ctx.author.id
     sql = "SELECT messages_count FROM users WHERE discord_id = $1"
@@ -78,6 +108,22 @@ async def messages_count(ctx):
         await ctx.send(f"Количество твоих сообщений: {messages_count}")
     else:
         await ctx.send("Не удалось найти твою запись в базе данных.")
+
+
+@bot.command(name='achievements')
+async def achievements(ctx):
+    author = ctx.message.author
+    discord_id = author.id
+    achievements = await get_achievements(discord_id)
+    if achievements:
+        achievement_list = "\n".join(achievements)
+        await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
+    else:
+        await ctx.send(f'{author.mention}, у вас пока нет ачивок.')
+
+
+
+
 
 @slash.slash(description="Бросить монетку")
 async def coinflip(ctx):
@@ -144,6 +190,9 @@ async def on_message(message):
         await message.add_reaction('👎')
 
     await bot.process_commands(message)
+
+    message_count = await get_message_count(user_id)
+    await check_achievement(user_id, message_count)
 
 
 @bot.event
