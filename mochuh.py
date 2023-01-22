@@ -28,6 +28,7 @@ async def connect_to_db():
                                                host=db_host,
                                                port=5432,
                                                database=db_database)
+        print(connection._connect_kwargs)
         print("Successfully connected to the database")
         return connection
     except (Exception, asyncpg.Error) as error:
