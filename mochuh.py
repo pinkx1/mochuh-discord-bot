@@ -68,6 +68,17 @@ async def sigame(ctx):
                                     file=discord.File('./sigame.png'))
 
 
+@slash.slash(description="Количество моих сообщений")
+async def messages_count(ctx):
+    user_id = ctx.author.id
+    sql = "SELECT messages_count FROM users WHERE discord_id = $1"
+    result = await connection.fetchrow(sql, user_id)
+    if result:
+        messages_count = result["messages_count"]
+        await ctx.send(f"Количество твоих сообщений: {messages_count}")
+    else:
+        await ctx.send("Не удалось найти твою запись в базе данных.")
+
 @slash.slash(description="Бросить монетку")
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
