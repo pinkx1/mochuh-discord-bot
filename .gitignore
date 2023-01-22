@@ -1,2 +1,6 @@
 # Ignore token file
 .env
+# Ignore venv
+venv/
+
+.idea/

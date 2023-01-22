@@ -7,13 +7,34 @@ from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
 from time import sleep
-
+import asyncio
+import asyncpg
 
 load_dotenv()
 token = os.getenv('token')
 
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
+
+
+async def connect_to_db():
+    db_user = os.getenv('user')
+    db_password = os.getenv('db_password')
+    db_host = os.getenv('db_host')
+    db_database = os.getenv('db_database')
+    try:
+        connection = await asyncpg.create_pool(user=db_user,
+                                               password=db_password,
+                                               host=db_host,
+                                               port=5432,
+                                               database=db_database)
+        print("Successfully connected to the database")
+        return connection
+    except (Exception, asyncpg.Error) as error:
+        print("Error while connecting to PostgreSQL", error)
+
+
+
 
 
 @bot.event
@@ -25,8 +46,10 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_ready():
-    print('bot connected')
+    print('Bot connected')
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
+    global connection
+    connection = await connect_to_db()
 
 
 @commands.has_permissions(administrator=True)
@@ -58,6 +81,21 @@ async def on_member_join(member):
 
 @bot.event
 async def on_message(message):
+    if message.author == bot.user:
+        return
+    user_id = message.author.id
+    # Проверяем наличие пользователя в базе данных
+    sql = "SELECT * FROM users WHERE discord_id = $1"
+    user_data = await connection.fetchrow(sql, user_id)
+    if user_data:
+        # Если пользователь есть в базе данных, то обновляем messages_count
+        sql = "UPDATE users SET messages_count = messages_count + 1 WHERE discord_id = $1"
+        await connection.execute(sql, user_id)
+    else:
+        # Если пользователя нет в базе данных, то добавляем его
+        sql = "INSERT INTO users(discord_id, messages_count) VALUES($1, 1)"
+        await connection.execute(sql, user_id)
+
     if message.author == bot.user:
         return
 
