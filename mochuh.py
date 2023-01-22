@@ -18,7 +18,7 @@ slash = SlashCommand(bot, sync_commands=True)
 
 
 async def connect_to_db():
-    db_user = os.getenv('user')
+    db_user = os.getenv('db_user')
     db_password = os.getenv('db_password')
     db_host = os.getenv('db_host')
     db_database = os.getenv('db_database')
