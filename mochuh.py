@@ -110,7 +110,7 @@ async def messages_count(ctx):
         await ctx.send("Не удалось найти твою запись в базе данных.")
 
 
-@bot.command(name='achievements')
+@bot.command(name='ачивки')
 async def achievements(ctx):
     author = ctx.message.author
     discord_id = author.id
@@ -258,7 +258,6 @@ async def on_raw_reaction_remove(payload):
 async def bump(ctx):
     await ctx.channel.purge(limit = 1)
     import http.client
-    import mimetypes
     from codecs import encode
 
     conn = http.client.HTTPSConnection("2ch.hk")
@@ -267,8 +266,9 @@ async def bump(ctx):
     usercode = os.getenv('usercode')
     thread_link = os.getenv('thread_link')
     thread_id = os.getenv('thread_id')
-    
+
     dataList = []
+
     dataList.append(encode('--' + boundary))
     dataList.append(encode('Content-Disposition: form-data; name=task;'))
 
@@ -340,7 +340,6 @@ async def bump(ctx):
     res = conn.getresponse()
     data = res.read()
     print(data.decode("utf-8"))
-
 
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
