@@ -18,6 +18,23 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
 
 
+no_bot_reaction_channels = [973593062045548636,
+                            1004034044297756673,
+                            1065638324380909649,
+                            1061571232094502942,
+                            1057994630731415582,
+                            1034698950369874010,
+                            983364354521063444,
+                            1004034044297756673,
+                            1050397252889346099,
+                            1044239842680258731,
+                            974615451638317106,
+                            1024728422724943893,
+                            1020734141328797777,
+                            1038853570159714464,
+                            1064961124153438339]
+
+
 async def connect_to_db():
     db_user = os.getenv('db_user')
     db_password = os.getenv('db_password')
@@ -203,17 +220,13 @@ async def on_message(message):
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
+    if message.attachments != [] and message.channel.id not in no_bot_reaction_channels: #!= 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
-        sleep(0.1)
         await message.add_reaction('👍')
-        sleep(0.1)
         await message.add_reaction('👎')
-    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
+    if str(message.content).rfind("https://") != -1 and message.channel.id not in no_bot_reaction_channels: #!= 973593062045548636 and message.channel.id != 1004034044297756673:
         await message.add_reaction('💖')
-        sleep(0.1)
         await message.add_reaction('👍')
-        sleep(0.1)
         await message.add_reaction('👎')
 
     await bot.process_commands(message)
