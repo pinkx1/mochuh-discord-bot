@@ -10,10 +10,10 @@ from time import sleep
 import asyncio
 import asyncpg
 from typing import List
+import datetime
 
 load_dotenv()
 token = os.getenv('token')
-
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
 
@@ -33,6 +33,9 @@ async def connect_to_db():
         return connection
     except (Exception, asyncpg.Error) as error:
         print("Error while connecting to PostgreSQL", error)
+
+
+
 
 
 async def check_achievement(discord_id: int, message_count: int):
@@ -58,13 +61,40 @@ async def get_message_count(discord_id):
     return result
 
 
-# async def view_achievements(user_id: int) -> str:
-#     query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
-#     achievements = await connection.fetch(query, user_id)
-#     if not achievements:
-#         return 'У тебя пока что нет ачивок'
-#     else:
-#         return 'Твои ачивки: ' + ', '.join([achievement_name['achievement'] for achievement_name in achievements])
+spam_protection = {}
+spam_list = []
+
+
+def add_user_to_spam_list(user_id):
+    current_time = datetime.datetime.now()
+    if user_id in spam_protection:
+        if (current_time - spam_protection[user_id]['last_message_time']).total_seconds() < 60:
+            spam_protection[user_id]['message_count'] += 1
+        else:
+            spam_protection[user_id]['message_count'] = 1
+    else:
+        spam_protection[user_id] = {'last_message_time': current_time, 'message_count': 1}
+    if spam_protection[user_id]['message_count'] > 7:
+        spam_list.append(user_id)
+
+
+def check_spam_list():
+    current_time = datetime.datetime.now()
+    for user_id in list(spam_list):
+        if (current_time - spam_protection[user_id]['last_message_time']).total_seconds() > 300:
+            del spam_list[user_id]
+
+
+async def remove_user_from_spam_list(user_id):
+    spam_list.pop(user_id, None)
+    print(f'User {user_id} removed from spam list.')
+
+
+async def add_exp(exp: int, user_id: int):
+    if user_id in spam_list:
+        return
+    await connection.execute("INSERT INTO users (discord_id, exp) VALUES ($1, $2) ON CONFLICT (discord_id) DO UPDATE SET exp = users.exp + $2", user_id, exp)
+    print(f"User with ID {user_id} получил експу")
 
 
 @bot.event
@@ -153,9 +183,6 @@ async def on_message(message):
         sql = "INSERT INTO users(discord_id, messages_count) VALUES($1, 1)"
         await connection.execute(sql, user_id)
 
-    if message.author == bot.user:
-        return
-
     if message.content.lower() in ("да", "дa", "da", "dа"):
         chance = random.randint(1,4)
         if chance == 1:
@@ -194,6 +221,14 @@ async def on_message(message):
     message_count = await get_message_count(user_id)
     await check_achievement(user_id, message_count)
 
+    exp = random.randint(5, 15)
+    await add_exp(exp, user_id)
+    add_user_to_spam_list(user_id)
+    check_spam_list()
+    if user_id in spam_list:
+        print("User is on the spam list.")
+    else:
+        print("User is not on the spam list.")
 
 @bot.event
 async def on_raw_reaction_add(payload):
