@@ -1,6 +1,7 @@
 import random
 import os
 import discord
+from discord import member
 from discord.ext import commands
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
@@ -54,7 +55,8 @@ async def connect_to_db():
 
 
 async def check_achievement(discord_id: int, message_count: int):
-    if message_count >= 5000:
+
+    if message_count >= 2391:
         existing_achievement = await connection.fetchval("SELECT COUNT(*) "
                                                          "FROM achievements "
                                                          "WHERE discord_id = $1 "
@@ -63,7 +65,9 @@ async def check_achievement(discord_id: int, message_count: int):
         if existing_achievement == 0:
             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
                                      "VALUES ($1, 'Спейсователь')", discord_id)
-            print(f"{discord_id} получил ачивку 'Спейсователь'!")
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Спейсователь»!")
 
 
 async def get_achievements(discord_id) -> List[str]:
@@ -106,7 +110,6 @@ def check_spam_list():
 
 async def remove_user_from_spam_list(user_id):
     spam_list.pop(user_id, None)
-    print(f'User {user_id} removed from spam list.')
 
 
 async def add_exp(exp: int, user_id: int):
