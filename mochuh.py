@@ -18,6 +18,24 @@ bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 slash = SlashCommand(bot, sync_commands=True)
 
 
+no_bot_reaction_channels = [973593062045548636,
+                            1004034044297756673,
+                            1065638324380909649,
+                            1061571232094502942,
+                            1057994630731415582,
+                            1034698950369874010,
+                            983364354521063444,
+                            1004034044297756673,
+                            1050397252889346099,
+                            1044239842680258731,
+                            974615451638317106,
+                            1024728422724943893,
+                            1020734141328797777,
+                            1038853570159714464,
+                            1064961124153438339,
+                            1085563045020975256]
+
+
 async def connect_to_db():
     db_user = os.getenv('db_user')
     db_password = os.getenv('db_password')
@@ -35,18 +53,17 @@ async def connect_to_db():
         print("Error while connecting to PostgreSQL", error)
 
 
-
-
-
 async def check_achievement(discord_id: int, message_count: int):
-    if message_count >= 1000:
-        # Проверяем, есть ли уже у пользователя эта ачивка
-        existing_achievement = await connection.fetchval("SELECT COUNT(*) FROM achievements WHERE discord_id = $1 AND achievement_name = 'Спейсователь'", discord_id)
+    if message_count >= 5000:
+        existing_achievement = await connection.fetchval("SELECT COUNT(*) "
+                                                         "FROM achievements "
+                                                         "WHERE discord_id = $1 "
+                                                         "AND achievement_name = 'Спейсователь'", discord_id)
 
-        # Если ачивки еще нет, добавляем ее
         if existing_achievement == 0:
-            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) VALUES ($1, 'Спейсователь')", discord_id)
-            print(f"User with ID {discord_id} has earned the 'Спейсователь' achievement!")
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Спейсователь')", discord_id)
+            print(f"{discord_id} получил ачивку 'Спейсователь'!")
 
 
 async def get_achievements(discord_id) -> List[str]:
@@ -56,7 +73,9 @@ async def get_achievements(discord_id) -> List[str]:
 
 
 async def get_message_count(discord_id):
-    query = 'SELECT messages_count FROM users WHERE discord_id = $1'
+    query = 'SELECT messages_count ' \
+            'FROM users ' \
+            'WHERE discord_id = $1'
     result = await connection.fetchval(query, discord_id)
     return result
 
@@ -93,8 +112,11 @@ async def remove_user_from_spam_list(user_id):
 async def add_exp(exp: int, user_id: int):
     if user_id in spam_list:
         return
-    await connection.execute("INSERT INTO users (discord_id, exp) VALUES ($1, $2) ON CONFLICT (discord_id) DO UPDATE SET exp = users.exp + $2", user_id, exp)
-    print(f"User with ID {user_id} получил експу")
+    await connection.execute("INSERT INTO users (discord_id, exp) "
+                             "VALUES ($1, $2) "
+                             "ON CONFLICT (discord_id) "
+                             "DO UPDATE SET exp = users.exp + $2",
+                             user_id, exp)
 
 
 @bot.event
@@ -107,7 +129,7 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     print('Bot connected')
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game('жижу 2'))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game('приколы'))
     global connection
     connection = await connect_to_db()
 
@@ -131,7 +153,9 @@ async def sigame(ctx):
 @slash.slash(description="Количество твоих сообщений")
 async def messages_count(ctx):
     user_id = ctx.author.id
-    sql = "SELECT messages_count FROM users WHERE discord_id = $1"
+    sql = "SELECT messages_count " \
+          "FROM users " \
+          "WHERE discord_id = $1"
     result = await connection.fetchrow(sql, user_id)
     if result:
         messages_count = result["messages_count"]
@@ -149,7 +173,7 @@ async def achievements(ctx):
         achievement_list = "\n".join(achievements)
         await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
     else:
-        await ctx.send(f'{author.mention}, у вас пока нет ачивок.')
+        await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
 
 
 
@@ -162,8 +186,11 @@ async def coinflip(ctx):
 
 @bot.event
 async def on_member_join(member):
-    channel = bot.get_channel(973593062045548636)
-    await channel.send(f"{member.mention} проскальзывает на сервер! Ласкаво просимо!")
+    channel = bot.get_channel(1085563045020975256)
+    emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
+    emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
+
+    await channel.send(f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
 
 
 @bot.event
@@ -171,16 +198,18 @@ async def on_message(message):
     if message.author == bot.user:
         return
     user_id = message.author.id
-    # Проверяем наличие пользователя в базе данных
-    sql = "SELECT * FROM users WHERE discord_id = $1"
+    sql = "SELECT * " \
+          "FROM users " \
+          "WHERE discord_id = $1"
     user_data = await connection.fetchrow(sql, user_id)
     if user_data:
-        # Если пользователь есть в базе данных, то обновляем messages_count
-        sql = "UPDATE users SET messages_count = messages_count + 1 WHERE discord_id = $1"
+        sql = "UPDATE users " \
+              "SET messages_count = messages_count + 1 " \
+              "WHERE discord_id = $1"
         await connection.execute(sql, user_id)
     else:
-        # Если пользователя нет в базе данных, то добавляем его
-        sql = "INSERT INTO users(discord_id, messages_count) VALUES($1, 1)"
+        sql = "INSERT INTO users(discord_id, messages_count) " \
+              "VALUES($1, 1)"
         await connection.execute(sql, user_id)
 
     if message.content.lower() in ("да", "дa", "da", "dа"):
@@ -203,17 +232,13 @@ async def on_message(message):
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    if message.attachments != [] and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
+    if message.attachments != [] and message.channel.id not in no_bot_reaction_channels:
         await message.add_reaction('💖')
-        sleep(0.1)
         await message.add_reaction('👍')
-        sleep(0.1)
         await message.add_reaction('👎')
-    if str(message.content).rfind("https://") != -1 and message.channel.id != 973593062045548636 and message.channel.id != 1004034044297756673:
+    if str(message.content).rfind("https://") != -1 and message.channel.id not in no_bot_reaction_channels:
         await message.add_reaction('💖')
-        sleep(0.1)
         await message.add_reaction('👍')
-        sleep(0.1)
         await message.add_reaction('👎')
 
     await bot.process_commands(message)
@@ -229,6 +254,7 @@ async def on_message(message):
         print("User is on the spam list.")
     else:
         print("User is not on the spam list.")
+
 
 @bot.event
 async def on_raw_reaction_add(payload):
