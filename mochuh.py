@@ -190,6 +190,7 @@ async def on_member_join(member):
     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
 
+    await asyncio.sleep(3)
     await channel.send(f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
 
 
@@ -252,8 +253,6 @@ async def on_message(message):
     check_spam_list()
     if user_id in spam_list:
         print("User is on the spam list.")
-    else:
-        print("User is not on the spam list.")
 
 
 @bot.event
