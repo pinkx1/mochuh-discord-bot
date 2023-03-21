@@ -69,21 +69,6 @@ async def check_achievement(discord_id: int, message_count: int):
             await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
 
 
-async def check_reaction_achievement(discord_id: int, reaction_count: int):
-    if reaction_count >= 2:
-        existing_achievement_reactions = await connection.fetchval("SELECT COUNT(*) "
-                                                         "FROM achievements "
-                                                         "WHERE discord_id = $1 "
-                                                         "AND achievement_name = 'Реакционер'", discord_id)
-
-        if existing_achievement_reactions == 0:
-            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
-                                     "VALUES ($1, 'Реакционер')", discord_id)
-            user = bot.get_user(discord_id)
-            channel = bot.get_channel(1034698950369874010)
-            await channel.send(f"{user.mention} получил ачивку «Реакционер» за более чем 200 реакций на сообщения!")
-
-
 async def get_achievements(discord_id) -> List[str]:
     query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
     achievements = await connection.fetch(query, discord_id)
@@ -269,9 +254,6 @@ async def on_message(message):
     await add_exp(exp, user_id)
     add_user_to_spam_list(user_id)
     check_spam_list()
-
-    reaction_count = sum([reaction.count for reaction in message.reactions if not reaction.me])
-    await check_reaction_achievement(message.author.id, reaction_count)
 
 
 @bot.event
