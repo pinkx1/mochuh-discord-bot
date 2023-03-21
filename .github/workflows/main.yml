@@ -12,6 +12,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
           port: 22
+          ssh-strict: false
           script: |
             cd /home/admin/github/mochuh-discord-bot/
             git pull
