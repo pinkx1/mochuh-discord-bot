@@ -175,7 +175,7 @@ async def achievements(ctx):
     achievements = await get_achievements(discord_id)
     if achievements:
         achievement_list = "\n".join(achievements)
-        await ctx.send(f'{author.mention}, ваши ачивки:\n\n{achievement_list}')
+        await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
     else:
         await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
 
