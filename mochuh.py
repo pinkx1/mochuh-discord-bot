@@ -56,12 +56,12 @@ async def connect_to_db():
 
 async def check_achievement(discord_id: int, message_count: int):
     if message_count >= 2000:
-        existing_achievement_spacevatel = await connection.fetchval("SELECT COUNT(*) "
+        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
                                                          "FROM achievements "
                                                          "WHERE discord_id = $1 "
                                                          "AND achievement_name = 'Спейсователь'", discord_id)
 
-        if existing_achievement_spacevatel == 0:
+        if existing_achievement_spacemaker == 0:
             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
                                      "VALUES ($1, 'Спейсователь')", discord_id)
             user = bot.get_user(discord_id)
@@ -70,7 +70,9 @@ async def check_achievement(discord_id: int, message_count: int):
 
 
 async def get_achievements(discord_id) -> List[str]:
-    query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
+    query = 'SELECT achievement_name ' \
+            'FROM achievements ' \
+            'WHERE discord_id = $1'
     achievements = await connection.fetch(query, discord_id)
     return [a["achievement_name"] for a in achievements]
 
@@ -166,7 +168,7 @@ async def messages_count(ctx):
         await ctx.send("Не удалось найти твою запись в базе данных.")
 
 
-@bot.command(name='ачивки')
+@slash.slash(description="Ачивки")
 async def achievements(ctx):
     author = ctx.message.author
     discord_id = author.id
