@@ -168,7 +168,7 @@ async def messages_count(ctx):
         await ctx.send("Не удалось найти твою запись в базе данных.")
 
 
-@slash.slash(description="Ачивки")
+@bot.command()
 async def achievements(ctx):
     author = ctx.message.author
     discord_id = author.id
