@@ -233,24 +233,12 @@ async def on_message(message):
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    #if message.attachments != [] and message.channel.id not in no_bot_reaction_channels:
-     #   await message.add_reaction('💖')
-     #   await message.add_reaction('👍')
-      #  await message.add_reaction('👎')
-   # if str(message.content).rfind("https://") != -1 and message.channel.id not in no_bot_reaction_channels:
-      #  await message.add_reaction('💖')
-      #  await message.add_reaction('👍')
-      #  await message.add_reaction('👎')
-
-  #  if message.channel.id == 1016973280940408843:
-      #  custom_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
-       # if custom_emoji is not None:
-       #     await message.add_reaction(custom_emoji)
-
     if message.channel.id == 1016973280940408843:
-        custom_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
-        if custom_emoji is not None:
-            await message.add_reaction(custom_emoji)
+        pepeheadphones_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
+        if pepeheadphones_emoji is not None:
+            await message.add_reaction(pepeheadphones_emoji)
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
     else:
         if (message.attachments != [] or str(message.content).rfind(
                 "https://") != -1) and message.channel.id not in no_bot_reaction_channels:
