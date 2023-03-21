@@ -1,6 +1,7 @@
 import random
 import os
 import discord
+from discord import member
 from discord.ext import commands
 from discord_slash import SlashCommand
 from dotenv import load_dotenv
@@ -54,16 +55,33 @@ async def connect_to_db():
 
 
 async def check_achievement(discord_id: int, message_count: int):
-    if message_count >= 5000:
-        existing_achievement = await connection.fetchval("SELECT COUNT(*) "
+    if message_count >= 2000:
+        existing_achievement_spacevatel = await connection.fetchval("SELECT COUNT(*) "
                                                          "FROM achievements "
                                                          "WHERE discord_id = $1 "
                                                          "AND achievement_name = 'Спейсователь'", discord_id)
 
-        if existing_achievement == 0:
+        if existing_achievement_spacevatel == 0:
             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
                                      "VALUES ($1, 'Спейсователь')", discord_id)
-            print(f"{discord_id} получил ачивку 'Спейсователь'!")
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
+
+
+async def check_reaction_achievement(discord_id: int, reaction_count: int):
+    if reaction_count >= 2:
+        existing_achievement_reactions = await connection.fetchval("SELECT COUNT(*) "
+                                                         "FROM achievements "
+                                                         "WHERE discord_id = $1 "
+                                                         "AND achievement_name = 'Реакционер'", discord_id)
+
+        if existing_achievement_reactions == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Реакционер')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Реакционер» за более чем 200 реакций на сообщения!")
 
 
 async def get_achievements(discord_id) -> List[str]:
@@ -106,7 +124,6 @@ def check_spam_list():
 
 async def remove_user_from_spam_list(user_id):
     spam_list.pop(user_id, None)
-    print(f'User {user_id} removed from spam list.')
 
 
 async def add_exp(exp: int, user_id: int):
@@ -198,6 +215,7 @@ async def on_member_join(member):
 async def on_message(message):
     if message.author == bot.user:
         return
+
     user_id = message.author.id
     sql = "SELECT * " \
           "FROM users " \
@@ -251,8 +269,9 @@ async def on_message(message):
     await add_exp(exp, user_id)
     add_user_to_spam_list(user_id)
     check_spam_list()
-    if user_id in spam_list:
-        print("User is on the spam list.")
+
+    reaction_count = sum([reaction.count for reaction in message.reactions if not reaction.me])
+    await check_reaction_achievement(message.author.id, reaction_count)
 
 
 @bot.event
