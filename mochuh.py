@@ -250,7 +250,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
     message_count = await get_message_count(user_id)
-    await check_achievement(user_id, message_count, message)
+    await check_achievement(connection, user_id, message_count, message)
 
     exp = random.randint(5, 15)
     await add_exp(exp, user_id)

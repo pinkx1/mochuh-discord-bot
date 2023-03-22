@@ -1,12 +1,9 @@
-from discord.ext import commands
 import discord
-from mochuh import connect_to_db
 
-connection = await connect_to_db()
-bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+from mochuh import bot
 
 
-async def check_achievement(discord_id: int, message_count: int, message):
+async def check_achievement(connection, discord_id: int, message_count: int, message):
     if message_count >= 2000:
         existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
                                                          "FROM achievements "
@@ -32,4 +29,3 @@ async def check_achievement(discord_id: int, message_count: int, message):
             user = bot.get_user(discord_id)
             channel = bot.get_channel(1034698950369874010)
             await channel.send(f"{user.mention} получил ачивку «Прадед»")
-
