@@ -68,7 +68,7 @@ async def check_achievement(discord_id: int, message_count: int, message):
             channel = bot.get_channel(1034698950369874010)
             await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
 
-    if message.content.lower() == 'получка':
+    if 'получка' in message.content.lower():
         existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
                                                                     "FROM achievements "
                                                                     "WHERE discord_id = $1 "
