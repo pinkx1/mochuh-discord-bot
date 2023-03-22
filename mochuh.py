@@ -184,7 +184,7 @@ async def messages_count(ctx):
 #@bot.command(name='ачивки')
 @slash.slash(description="Твои ачивки")
 async def achievements(ctx):
-    author = ctx.message.author
+    author = ctx.author
     discord_id = author.id
     achievements = await get_achievements(discord_id)
     if achievements:
