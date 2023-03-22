@@ -1,4 +1,4 @@
-# mochuh-discord-bot
+# Mochuh
 Bot for Discord
 
 Функции бота:
