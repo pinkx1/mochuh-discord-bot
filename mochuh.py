@@ -194,6 +194,7 @@ async def achievements(ctx):
         await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
 
 
+
 @slash.slash(description="Бросить монетку")
 async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
