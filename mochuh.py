@@ -191,8 +191,16 @@ async def on_member_join(member):
     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     await channel.send(f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+
+
+@bot.event
+async def on_member_remove(member):
+    emoji_pepe_cleaner = discord.utils.get(bot.emojis, name='cleaner')
+    channel = bot.get_channel(1064961124153438339)
+    await channel.send(f"{member.mention} был смыт в унитаз")
+    await channel.send(f"{emoji_pepe_cleaner}")
 
 
 @bot.event
