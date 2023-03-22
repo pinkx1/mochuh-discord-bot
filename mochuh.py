@@ -53,23 +53,38 @@ async def connect_to_db():
         print("Error while connecting to PostgreSQL", error)
 
 
-async def check_achievement(discord_id: int, message_count: int):
+async def check_achievement(discord_id: int, message_count: int, message):
     if message_count >= 2000:
-        existing_achievement_spacevatel = await connection.fetchval("SELECT COUNT(*) "
+        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
                                                                     "FROM achievements "
                                                                     "WHERE discord_id = $1 "
                                                                     "AND achievement_name = 'Спейсователь'", discord_id)
 
-        if existing_achievement_spacevatel == 0:
+        if existing_achievement_spacemaker == 0:
             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
                                      "VALUES ($1, 'Спейсователь')", discord_id)
             user = bot.get_user(discord_id)
             channel = bot.get_channel(1034698950369874010)
             await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
 
+    if 'получка' in message.content.lower():
+        existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
+                                                                  "FROM achievements "
+                                                                  "WHERE discord_id = $1 "
+                                                                  "AND achievement_name = 'Прадед'", discord_id)
+
+        if existing_achievement_poluchka == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Прадед')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Прадед»")
+
 
 async def get_achievements(discord_id) -> List[str]:
-    query = 'SELECT achievement_name FROM achievements WHERE discord_id = $1'
+    query = 'SELECT achievement_name ' \
+            'FROM achievements ' \
+            'WHERE discord_id = $1'
     achievements = await connection.fetch(query, discord_id)
     return [a["achievement_name"] for a in achievements]
 
@@ -165,9 +180,10 @@ async def messages_count(ctx):
         await ctx.send("Не удалось найти твою запись в базе данных.")
 
 
-@bot.command(name='ачивки')
+# @bot.command(name='ачивки')
+@slash.slash(description="Твои ачивки")
 async def achievements(ctx):
-    author = ctx.message.author
+    author = ctx.author
     discord_id = author.id
     achievements = await get_achievements(discord_id)
     if achievements:
@@ -188,9 +204,17 @@ async def on_member_join(member):
     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     await channel.send(
         f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+
+
+@bot.event
+async def on_member_remove(member):
+    emoji_pepe_cleaner = discord.utils.get(bot.emojis, name='cleaner')
+    channel = bot.get_channel(1064961124153438339)
+    await channel.send(f"{member.mention} был смыт в унитаз")
+    await channel.send(f"{emoji_pepe_cleaner}")
 
 
 @bot.event
@@ -233,24 +257,12 @@ async def on_message(message):
     if str(message.author.roles).find('1016367823490134027') != -1:
         await message.add_reaction('💩')
 
-    # if message.attachments != [] and message.channel.id not in no_bot_reaction_channels:
-    #   await message.add_reaction('💖')
-    #   await message.add_reaction('👍')
-    #  await message.add_reaction('👎')
-    # if str(message.content).rfind("https://") != -1 and message.channel.id not in no_bot_reaction_channels:
-    #  await message.add_reaction('💖')
-    #  await message.add_reaction('👍')
-    #  await message.add_reaction('👎')
-
-    #  if message.channel.id == 1016973280940408843:
-    #  custom_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
-    # if custom_emoji is not None:
-    #     await message.add_reaction(custom_emoji)
-
     if message.channel.id == 1016973280940408843:
-        custom_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
-        if custom_emoji is not None:
-            await message.add_reaction(custom_emoji)
+        pepeheadphones_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
+        if pepeheadphones_emoji is not None:
+            await message.add_reaction(pepeheadphones_emoji)
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
     else:
         if (message.attachments != [] or str(message.content).rfind(
                 "https://") != -1) and message.channel.id not in no_bot_reaction_channels:
@@ -261,7 +273,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
     message_count = await get_message_count(user_id)
-    await check_achievement(user_id, message_count)
+    await check_achievement(user_id, message_count, message)
 
     exp = random.randint(5, 15)
     await add_exp(exp, user_id)
