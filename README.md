@@ -1,5 +1,5 @@
 # Mochuh
-Bot for Discord
+### Bot for Discord
 
 Функции бота:
 
