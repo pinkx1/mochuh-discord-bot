@@ -3,7 +3,7 @@ import os
 import discord
 from discord import member
 from discord.ext import commands
-from discord_slash import SlashCommand
+from discord_slash import SlashCommand, SlashContext
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
@@ -12,10 +12,12 @@ import asyncio
 import asyncpg
 from typing import List
 import datetime
+from datetime import datetime, timedelta
 
 load_dotenv()
 token = os.getenv('token')
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+client = discord.Client()
 slash = SlashCommand(bot, sync_commands=True)
 
 no_bot_reaction_channels = [973593062045548636,
@@ -133,6 +135,30 @@ async def add_exp(exp: int, user_id: int):
                              "ON CONFLICT (discord_id) "
                              "DO UPDATE SET exp = users.exp + $2",
                              user_id, exp)
+
+allowed_users = [417432559086206977, 144749098795270144]  # ID разрешенных пользователей
+
+
+@slash.slash(
+    name="clear",
+    description="Удаляет последние N сообщений в текущем канале",
+    options=[
+        {
+            "name": "amount",
+            "description": "Количество сообщений для удаления",
+            "type": 4,
+            "required": True
+        }
+    ]
+)
+async def clear(ctx: SlashContext, amount: int):
+    """Удаляет последние amount сообщений в текущем канале"""
+    if ctx.author.id in allowed_users:
+        await ctx.channel.purge(limit=amount)
+        await asyncio.sleep(1)
+        await ctx.send(f"Удалено {amount} сообщений.")
+    else:
+        await ctx.send("Вы не имеете доступа к этой команде.")
 
 
 @bot.event
