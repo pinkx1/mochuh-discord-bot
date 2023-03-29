@@ -104,7 +104,7 @@ spam_list = []
 
 
 def add_user_to_spam_list(user_id):
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     if user_id in spam_protection:
         if (current_time - spam_protection[user_id]['last_message_time']).total_seconds() < 60:
             spam_protection[user_id]['message_count'] += 1
@@ -230,9 +230,13 @@ async def on_member_join(member):
     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
 
-    await asyncio.sleep(5)
-    await channel.send(
-        f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+    async def send_greeting():
+        await asyncio.sleep(3)
+        await channel.send(
+            f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+
+    asyncio.create_task(send_greeting())
+
 
 
 @bot.event
