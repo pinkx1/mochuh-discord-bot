@@ -158,7 +158,7 @@ async def clear(ctx: SlashContext, amount: int):
         await asyncio.sleep(1)
         await ctx.send(f"Удалено {amount} сообщений.")
     else:
-        await ctx.send("Вы не имеете доступа к этой команде.")
+        await ctx.send("Вы не имеете доступа к этой команде :pepeMegasmile:")
 
 
 @bot.event
