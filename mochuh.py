@@ -13,6 +13,7 @@ import asyncpg
 from typing import List
 import datetime
 from datetime import datetime, timedelta
+import Bumper
 
 load_dotenv()
 token = os.getenv('token')
@@ -68,6 +69,19 @@ async def check_achievement(discord_id: int, message_count: int, message):
             user = bot.get_user(discord_id)
             channel = bot.get_channel(1034698950369874010)
             await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
+    
+    if message_count >= 10000:
+        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
+                                                                    "FROM achievements "
+                                                                    "WHERE discord_id = $1 "
+                                                                    "AND achievement_name = 'Архивариус 📚'", discord_id)
+
+        if existing_achievement_spacemaker == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Архивариус 📚')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Архивариус 📚» за 10000 сообщений на сервере!")
 
     if 'получка' in message.content.lower():
         existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
@@ -159,7 +173,8 @@ async def clear(ctx: SlashContext, amount: int):
         await ctx.send(f"Удалено {amount} сообщений.")
     else:
         emoji_pepeMegaSmile = discord.utils.get(bot.emojis, name='pepeMegasmile')
-        await ctx.send(f"Вы не имеете доступа к этой команде {emoji_pepeMegaSmile}")
+        await ctx.send(f"Вы не имеете доступа к этой команде.")
+        await ctx.send(f" {emoji_pepeMegaSmile} ")
 
 
 @bot.event
@@ -237,7 +252,6 @@ async def on_member_join(member):
             f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
 
     asyncio.create_task(send_greeting())
-
 
 
 @bot.event
@@ -376,90 +390,10 @@ async def on_raw_reaction_remove(payload):
 @bot.command()
 async def bump(ctx):
     await ctx.channel.purge(limit=1)
-    import http.client
-    from codecs import encode
-
-    conn = http.client.HTTPSConnection("2ch.hk")
-    cookie = os.getenv('cookie')
-    boundary = os.getenv('boundary')
-    usercode = os.getenv('usercode')
-    thread_link = os.getenv('thread_link')
-    thread_id = os.getenv('thread_id')
-
-    dataList = []
-
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=task;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("post"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=board;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("ch"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=thread;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode(thread_id))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=usercode;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode(usercode))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=captcha_type;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("2chcaptcha"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=formimages[];'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("(binary)"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=comment;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("bump"))
-    dataList.append(encode('--' + boundary + '--'))
-    dataList.append(encode(''))
-    body = b'\r\n'.join(dataList)
-    payload = body
-    headers = {
-        'scheme': 'https',
-        'path': '/user/posting?nc=1',
-        'method': 'POST',
-        'authority': '2ch.hk',
-        'x-requested-with': 'XMLHttpRequest',
-        'sec-fetch-site': 'same-origin',
-        'sec-fetch-mode': 'cors',
-        'referer': thread_link,
-        'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
-        'cookie': cookie,
-        'origin': 'https://2ch.hk',
-        'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
-    }
-    conn.request("POST", "/user/posting?nc=1", payload, headers)
-    res = conn.getresponse()
-    data = res.read()
-    print(data.decode("utf-8"))
-
+    
+    temp_bumper = Bumper
+    temp_bumper.bump_function()
+    
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
 
