@@ -3,7 +3,7 @@ import os
 import discord
 from discord import member
 from discord.ext import commands
-from discord_slash import SlashCommand
+from discord_slash import SlashCommand, SlashContext
 from dotenv import load_dotenv
 from email import message
 from inspect import getcomments
@@ -12,13 +12,14 @@ import asyncio
 import asyncpg
 from typing import List
 import datetime
-from achievement_function import check_achievement
+from datetime import datetime, timedelta
+import Bumper
 
 load_dotenv()
 token = os.getenv('token')
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+client = discord.Client()
 slash = SlashCommand(bot, sync_commands=True)
-
 
 no_bot_reaction_channels = [973593062045548636,
                             1004034044297756673,
@@ -55,7 +56,45 @@ async def connect_to_db():
         print("Error while connecting to PostgreSQL", error)
 
 
+async def check_achievement(discord_id: int, message_count: int, message):
+    if message_count >= 2000:
+        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
+                                                                    "FROM achievements "
+                                                                    "WHERE discord_id = $1 "
+                                                                    "AND achievement_name = 'Спейсователь'", discord_id)
 
+        if existing_achievement_spacemaker == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Спейсователь')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
+    
+    if message_count >= 10000:
+        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
+                                                                    "FROM achievements "
+                                                                    "WHERE discord_id = $1 "
+                                                                    "AND achievement_name = 'Архивариус 📚'", discord_id)
+
+        if existing_achievement_spacemaker == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Архивариус 📚')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Архивариус 📚» за 10000 сообщений на сервере!")
+
+    if 'получка' in message.content.lower():
+        existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
+                                                                  "FROM achievements "
+                                                                  "WHERE discord_id = $1 "
+                                                                  "AND achievement_name = 'Прадед'", discord_id)
+
+        if existing_achievement_poluchka == 0:
+            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+                                     "VALUES ($1, 'Прадед')", discord_id)
+            user = bot.get_user(discord_id)
+            channel = bot.get_channel(1034698950369874010)
+            await channel.send(f"{user.mention} получил ачивку «Прадед»")
 
 
 async def get_achievements(discord_id) -> List[str]:
@@ -79,7 +118,7 @@ spam_list = []
 
 
 def add_user_to_spam_list(user_id):
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
     if user_id in spam_protection:
         if (current_time - spam_protection[user_id]['last_message_time']).total_seconds() < 60:
             spam_protection[user_id]['message_count'] += 1
@@ -111,6 +150,32 @@ async def add_exp(exp: int, user_id: int):
                              "DO UPDATE SET exp = users.exp + $2",
                              user_id, exp)
 
+allowed_users = [417432559086206977, 144749098795270144]  # ID разрешенных пользователей
+
+
+@slash.slash(
+    name="clear",
+    description="Удаляет последние N сообщений в текущем канале",
+    options=[
+        {
+            "name": "amount",
+            "description": "Количество сообщений для удаления",
+            "type": 4,
+            "required": True
+        }
+    ]
+)
+async def clear(ctx: SlashContext, amount: int):
+    """Удаляет последние amount сообщений в текущем канале"""
+    if ctx.author.id in allowed_users:
+        await ctx.channel.purge(limit=amount)
+        await asyncio.sleep(1)
+        await ctx.send(f"Удалено {amount} сообщений.")
+    else:
+        emoji_pepeMegaSmile = discord.utils.get(bot.emojis, name='pepeMegasmile')
+        await ctx.send(f"Вы не имеете доступа к этой команде.")
+        await ctx.send(f" {emoji_pepeMegaSmile} ")
+
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -130,17 +195,17 @@ async def on_ready():
 @commands.has_permissions(administrator=True)
 @bot.command()
 async def say(ctx, *, arg):
-    await ctx.channel.purge(limit = 1)
+    await ctx.channel.purge(limit=1)
     await ctx.send(arg)
 
 
 @slash.slash(description="Лобби SiGame")
 async def sigame(ctx):
     await ctx.send('Программа на пк: <https://vladimirkhil.com/si/game>\n'
-                                    'Онлайн: <https://vladimirkhil.com/si/online/>\n'
-                                    'Название лобби: gay123\n'
-                                    'Пароль: 1099\n',
-                                    file=discord.File('./sigame.png'))
+                   'Онлайн: <https://vladimirkhil.com/si/online/>\n'
+                   'Название лобби: gay123\n'
+                   'Пароль: 1099\n',
+                   file=discord.File('./sigame.png'))
 
 
 @slash.slash(description="Количество твоих сообщений")
@@ -157,7 +222,7 @@ async def messages_count(ctx):
         await ctx.send("Не удалось найти твою запись в базе данных.")
 
 
-#@bot.command(name='ачивки')
+# @bot.command(name='ачивки')
 @slash.slash(description="Твои ачивки")
 async def achievements(ctx):
     author = ctx.author
@@ -168,7 +233,6 @@ async def achievements(ctx):
         await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
     else:
         await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
-
 
 
 @slash.slash(description="Бросить монетку")
@@ -182,15 +246,19 @@ async def on_member_join(member):
     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
 
-    await asyncio.sleep(5)
-    await channel.send(f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+    async def send_greeting():
+        await asyncio.sleep(3)
+        await channel.send(
+            f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+
+    asyncio.create_task(send_greeting())
 
 
 @bot.event
 async def on_member_remove(member):
     emoji_pepe_cleaner = discord.utils.get(bot.emojis, name='cleaner')
     channel = bot.get_channel(1064961124153438339)
-    await channel.send(f"{member.mention} был смыт в унитаз")
+    await channel.send(f"{member.mention} покинул сервер")
     await channel.send(f"{emoji_pepe_cleaner}")
 
 
@@ -215,19 +283,19 @@ async def on_message(message):
         await connection.execute(sql, user_id)
 
     if message.content.lower() in ("да", "дa", "da", "dа"):
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
             await message.channel.send(content='пизда')
 
     if message.content.lower() == "нет":
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
             await message.channel.send(content='пидора ответ')
 
     if message.content.lower() == ("300", "триста"):
-        chance = random.randint(1,4)
+        chance = random.randint(1, 4)
         if chance == 1:
-          await message.channel.send(content='отсоси у тракториста')
+            await message.channel.send(content='отсоси у тракториста')
 
     if message.author == bot.user:
         return
@@ -235,11 +303,13 @@ async def on_message(message):
         await message.add_reaction('💩')
 
     if message.channel.id == 1016973280940408843:
-        pepeheadphones_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
-        if pepeheadphones_emoji is not None:
-            await message.add_reaction(pepeheadphones_emoji)
-            await message.add_reaction('👍')
-            await message.add_reaction('👎')
+        if (message.attachments != [] or str(message.content).rfind(
+                "https://") != -1):
+            pepeheadphones_emoji = discord.utils.get(message.guild.emojis, name='pepeheadphones')
+            if pepeheadphones_emoji is not None:
+                await message.add_reaction(pepeheadphones_emoji)
+                await message.add_reaction('👍')
+                await message.add_reaction('👎')
     else:
         if (message.attachments != [] or str(message.content).rfind(
                 "https://") != -1) and message.channel.id not in no_bot_reaction_channels:
@@ -250,7 +320,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
     message_count = await get_message_count(user_id)
-    await check_achievement(connection, user_id, message_count, message)
+    await check_achievement(user_id, message_count, message)
 
     exp = random.randint(5, 15)
     await add_exp(exp, user_id)
@@ -263,7 +333,7 @@ async def on_raw_reaction_add(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
+        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -277,7 +347,7 @@ async def on_raw_reaction_add(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.add_roles(role)
                 print('done')
@@ -292,7 +362,7 @@ async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
     if message_id == 1039187036600553522:
         guild_id = payload.guild_id
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
+        guild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == 'sigame':
             role = discord.utils.get(guild.roles, name='Своя Игра')
@@ -306,7 +376,7 @@ async def on_raw_reaction_remove(payload):
             role = discord.utils.get(guild.roles, name=payload.emoji.name)
 
         if role is not None:
-            member = discord.utils.find(lambda m : m.id == payload.user_id, guild.members)
+            member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
             if member is not None:
                 await member.remove_roles(role)
                 print('done')
@@ -319,93 +389,13 @@ async def on_raw_reaction_remove(payload):
 @commands.has_permissions(administrator=True)
 @bot.command()
 async def bump(ctx):
-    await ctx.channel.purge(limit = 1)
-    import http.client
-    from codecs import encode
-
-    conn = http.client.HTTPSConnection("2ch.hk")
-    cookie = os.getenv('cookie')
-    boundary = os.getenv('boundary')
-    usercode = os.getenv('usercode')
-    thread_link = os.getenv('thread_link')
-    thread_id = os.getenv('thread_id')
-
-    dataList = []
-
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=task;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("post"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=board;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("ch"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=thread;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode(thread_id))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=usercode;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode(usercode))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=captcha_type;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("2chcaptcha"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=formimages[];'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("(binary)"))
-    dataList.append(encode('--' + boundary))
-    dataList.append(encode('Content-Disposition: form-data; name=comment;'))
-
-    dataList.append(encode('Content-Type: {}'.format('text/plain')))
-    dataList.append(encode(''))
-
-    dataList.append(encode("bump"))
-    dataList.append(encode('--'+boundary+'--'))
-    dataList.append(encode(''))
-    body = b'\r\n'.join(dataList)
-    payload = body
-    headers = {
-        'scheme': 'https',
-        'path': '/user/posting?nc=1',
-        'method': 'POST',
-        'authority': '2ch.hk',
-        'x-requested-with': 'XMLHttpRequest',
-        'sec-fetch-site': 'same-origin',
-        'sec-fetch-mode': 'cors',
-        'referer': thread_link,
-        'accept-language': 'en-US,en;q=0.9,ru;q=0.8',
-        'cookie': cookie,
-        'origin': 'https://2ch.hk',
-        'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
-    }
-    conn.request("POST", "/user/posting?nc=1", payload, headers)
-    res = conn.getresponse()
-    data = res.read()
-    print(data.decode("utf-8"))
-
+    await ctx.channel.purge(limit=1)
+    
+    temp_bumper = Bumper
+    temp_bumper.bump_function()
+    
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
-    
-bot.run(token)
 
+
+bot.run(token)
