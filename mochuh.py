@@ -158,7 +158,8 @@ async def clear(ctx: SlashContext, amount: int):
         await asyncio.sleep(1)
         await ctx.send(f"Удалено {amount} сообщений.")
     else:
-        await ctx.send("Вы не имеете доступа к этой команде :pepeMegasmile:")
+        emoji_pepeMegaSmile = discord.utils.get(bot.emojis, name='pepeMegasmile')
+        await ctx.send(f"Вы не имеете доступа к этой команде {emoji_pepeMegaSmile}")
 
 
 @bot.event
