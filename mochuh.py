@@ -397,4 +397,5 @@ async def bump(ctx):
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
 
+
 bot.run(token)
