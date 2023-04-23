@@ -205,7 +205,7 @@ async def sigame(ctx):
                    'Онлайн: <https://vladimirkhil.com/si/online/>\n'
                    'Название лобби: gay123\n'
                    'Пароль: 1099\n',
-                   file=discord.File('./sigame.png'))
+                   file=discord.File('./SiGameStart.gif'))
 
 
 @slash.slash(description="Количество твоих сообщений")
