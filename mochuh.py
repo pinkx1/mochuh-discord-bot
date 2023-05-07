@@ -1,13 +1,9 @@
 import random
 import os
 import discord
-from discord import member
 from discord.ext import commands
 from discord_slash import SlashCommand, SlashContext
 from dotenv import load_dotenv
-from email import message
-from inspect import getcomments
-from time import sleep
 import asyncio
 import asyncpg
 from typing import List
@@ -36,7 +32,8 @@ no_bot_reaction_channels = [973593062045548636,
                             1020734141328797777,
                             1038853570159714464,
                             1064961124153438339,
-                            1085563045020975256]
+                            1085563045020975256,
+                            1102235103008149544]
 
 
 async def connect_to_db():
@@ -150,7 +147,7 @@ async def add_exp(exp: int, user_id: int):
                              "DO UPDATE SET exp = users.exp + $2",
                              user_id, exp)
 
-allowed_users = [417432559086206977, 144749098795270144]  # ID разрешенных пользователей
+allowed_users = [417432559086206977, 144749098795270144]
 
 
 @slash.slash(
@@ -211,15 +208,18 @@ async def sigame(ctx):
 @slash.slash(description="Количество твоих сообщений")
 async def messages_count(ctx):
     user_id = ctx.author.id
+    emoji_pepeSmart = discord.utils.get(bot.emojis, name='pepeSmart')
+
     sql = "SELECT messages_count " \
           "FROM users " \
           "WHERE discord_id = $1"
     result = await connection.fetchrow(sql, user_id)
+
     if result:
         messages_count = result["messages_count"]
         await ctx.send(f"Количество твоих сообщений: {messages_count}")
     else:
-        await ctx.send("Не удалось найти твою запись в базе данных.")
+        await ctx.send(f"Не удалось найти твою запись в базе данных {emoji_pepeSmart}")
 
 
 # @bot.command(name='ачивки')
@@ -258,7 +258,7 @@ async def on_member_join(member):
 async def on_member_remove(member):
     emoji_pepe_cleaner = discord.utils.get(bot.emojis, name='cleaner')
     channel = bot.get_channel(1064961124153438339)
-    await channel.send(f"{member.name} покинул сервер")
+    await channel.send(f"{member.mention}, известный под именем {member.name}, покинул сервер")
     await channel.send(f"{emoji_pepe_cleaner}")
 
 
