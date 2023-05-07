@@ -258,7 +258,7 @@ async def on_member_join(member):
 async def on_member_remove(member):
     emoji_pepe_cleaner = discord.utils.get(bot.emojis, name='cleaner')
     channel = bot.get_channel(1064961124153438339)
-    await channel.send(f"{member.mention} покинул сервер")
+    await channel.send(f"{member.name} покинул сервер")
     await channel.send(f"{emoji_pepe_cleaner}")
 
 
