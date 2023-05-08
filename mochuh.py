@@ -441,6 +441,11 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
 
     poll_message = await ctx.channel.fetch_message(poll_message.id)
     results = {}
+    for reaction in poll_message.reactions:
+        if str(reaction.emoji) in [f"{i + 1}\u20e3" for i in range(len(options))]:
+            vote_count[int(str(reaction.emoji)[0]) - 1] += reaction.count - 1
+        results[str(reaction.emoji)] = reaction.count - 1
+
     max_votes = max(vote_count)
     max_vote_indices = [i for i, count in enumerate(vote_count) if count == max_votes]
     winner_index = random.choice(max_vote_indices) if len(max_vote_indices) > 1 else max_vote_indices[0]
