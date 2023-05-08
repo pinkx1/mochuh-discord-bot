@@ -439,7 +439,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     for reaction in poll_message.reactions:
         results[reaction.emoji] = reaction.count - 1
 
-    result_str = "**Результаты голосования:**\n\n"
+    result_str = f"**Результаты голосования на вопрос '{вопрос}'**\n\n"
     for i in range(len(options)):
         result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
 
