@@ -428,7 +428,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     option_str = ""
     for i in range(len(options)):
         option_str += f"{i+1}. {options[i]}\n"
-    poll_message = await ctx.send(f"**Голосование!**:\n {вопрос}\n\n{option_str}")
+    poll_message = await ctx.send(f"**Голосование!**\n\n{вопрос}\n\n{option_str}\n\nВремя для голосования: {время} мин.")
     for i in range(len(options)):
         await poll_message.add_reaction(f"{i+1}\u20e3")
 
