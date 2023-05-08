@@ -446,16 +446,19 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
             max_votes = reaction.count - 1
 
     emoji_ez = discord.utils.get(bot.emojis, name='EZ')
-    emoji_retarded_ez = discord.utils.get(bot.emojis, name='EZ')
+    emoji_retarded_ez = discord.utils.get(bot.emojis, name='pepeBasedge')
     await ctx.send('Бампнул тредю ' + str(emoji_ez))
 
     winners = [option for option, votes in results.items() if votes == max_votes]
     winner_str = ""
     if len(winners) == 1:
-        winner_str = f"Победитель: {winners[0]} {emoji_ez}"
+        winning_option = options[int(winners[0]) - 1]
+        winner_str = f"Победитель: {winning_option} {emoji_ez}"
+
     else:
         winner = random.choice(winners)
-        winner_str = f"Ничья! Победителя пришлось выбрать рандомно: {winner} {emoji_retarded_ez}"
+        winning_option = options[int(winner) - 1]
+        winner_str = f"Ничья! Победителя пришлось выбрать рандомно: {winning_option} {emoji_retarded_ez}"
 
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
