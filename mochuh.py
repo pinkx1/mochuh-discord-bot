@@ -449,14 +449,15 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     max_votes = max(vote_count)
     max_vote_indices = [i for i, count in enumerate(vote_count) if count == max_votes]
     winner_index = random.choice(max_vote_indices) if len(max_vote_indices) > 1 else max_vote_indices[0]
-
+    emoji_ez = discord.utils.get(bot.emojis, name='EZ')
+    emoji_ez_retarded = discord.utils.get(bot.emojis, name='pepeBasedge')
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
         result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], vote_count[i])
     if len(max_vote_indices) == 1:
-        result_str += f"\nПобедитель голосования: {options[winner_index]}"
+        result_str += f"\nПобедитель голосования: «{options[winner_index]}» {emoji_ez}"
     else:
-        result_str += f"\nНичья! Победитель голосования выбран рандомно: {options[winner_index]}"
+        result_str += f"\nНичья! Победитель голосования выбран рандомно, и это: «{options[winner_index]}» {emoji_ez_retarded}"
 
     await ctx.send(result_str)
     await poll_message.delete()
