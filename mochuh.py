@@ -457,7 +457,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     else:
         winner = random.choice(winners)
         winning_option = options[int(winner) - 1]
-        winner_str = f"Ничья! Победителя пришлось выбрать рандомно: {winning_option} {emoji_retarded_ez}"
+        winner_str = f"Ничья! Победителя пришлось выбрать рандомно, и это: {winning_option} {emoji_retarded_ez}"
 
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
