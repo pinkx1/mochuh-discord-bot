@@ -430,40 +430,40 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     options = варианты.split(",")
     option_str = ""
     for i in range(len(options)):
-        option_str += f"{i + 1}. {options[i]}\n"
-    poll_message = await ctx.send(
-        f"**Голосование!**\n\n{вопрос}\n\n{option_str}\nГолосование завершится через {время} минут")
-
-    buttons = [create_button(style=ButtonStyle.grey, label=f'{i + 1}. {options[i]}') for i in range(len(options))]
-    action_row = create_actionrow(*buttons)
-    message = await ctx.send(embed=None, components=[action_row])
-    components = [manage_components.create_button(style=ButtonStyle.grey, label=f'{i + 1}. {options[i]}') for i in
-                  range(len(options))]
-    poll_message = await ctx.channel.fetch_message(poll_message.id)
+        option_str += f"{i+1}. {options[i]}\n"
+    poll_message = await ctx.send(f"**Голосование!**\n\n{вопрос}\n\n{option_str}\nГолосование завершится через {время} минут")
     for i in range(len(options)):
-        await message.components[0].components[i].add_reaction(f"{i + 1}\u20e3")
+        await poll_message.add_reaction(f"{i+1}\u20e3")
 
-    await asyncio.sleep(время * 60)
+    await asyncio.sleep(время*60)
 
     poll_message = await ctx.channel.fetch_message(poll_message.id)
     results = {}
+    max_votes = 0
     for reaction in poll_message.reactions:
         results[reaction.emoji] = reaction.count - 1
+        if reaction.count - 1 > max_votes:
+            max_votes = reaction.count - 1
 
-    max_votes = max(results.values())
-    winners = [str(i + 1) for i, v in results.items() if v == max_votes]
+    emoji_ez = discord.utils.get(bot.emojis, name='EZ')
+    emoji_retarded_ez = discord.utils.get(bot.emojis, name='EZ')
+    await ctx.send('Бампнул тредю ' + str(emoji_ez))
 
+    winners = [option for option, votes in results.items() if votes == max_votes]
+    winner_str = ""
     if len(winners) == 1:
-        winner_str = f"Победитель: {options[int(winners[0]) - 1]}"
+        winner_str = f"Победитель: {winners[0]} {emoji_ez}"
     else:
         winner = random.choice(winners)
-        winner_str = f"Ничья! Победитель пришлось выбрать рандомно: {options[int(winner) - 1]}"
+        winner_str = f"Ничья! Победителя пришлось выбрать рандомно: {winner} {emoji_retarded_ez}"
 
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
-        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i + 1}\u20e3", 0))
-
+        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
     result_str += f"\n{winner_str}"
+
+    await ctx.send(result_str)
+    await poll_message.delete()
 
 
 bot.run(token)
