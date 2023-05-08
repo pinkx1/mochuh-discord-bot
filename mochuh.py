@@ -439,30 +439,12 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
 
     poll_message = await ctx.channel.fetch_message(poll_message.id)
     results = {}
-    max_votes = 0
     for reaction in poll_message.reactions:
         results[reaction.emoji] = reaction.count - 1
-        if reaction.count - 1 > max_votes:
-            max_votes = reaction.count - 1
-
-    emoji_ez = discord.utils.get(bot.emojis, name='EZ')
-    emoji_retarded_ez = discord.utils.get(bot.emojis, name='pepeBasedge')
-
-    winners = [option for option, votes in results.items() if votes == max_votes]
-    winner_str = ""
-    if len(winners) == 1:
-        winning_option = options[int(winners[0]) - 1]
-        winner_str = f"Победитель: {winning_option} {emoji_ez}"
-
-    else:
-        winner = random.choice(winners)
-        winning_option = options[int(winner) - 1]
-        winner_str = f"Ничья! Победителя пришлось выбрать рандомно, и это: {winning_option} {emoji_retarded_ez}"
 
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
         result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
-    result_str += f"\n{winner_str}"
 
     await ctx.send(result_str)
     await poll_message.delete()
