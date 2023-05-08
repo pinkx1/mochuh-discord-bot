@@ -428,7 +428,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     option_str = ""
     for i in range(len(options)):
         option_str += f"{i+1}. {options[i]}\n"
-    poll_message = await ctx.send(f"**Голосование!**\n\n{вопрос}\n\n{option_str}\n\nВремя для голосования: {время} мин.")
+    poll_message = await ctx.send(f"**Голосование!**\n\n{вопрос}\n\n{option_str}\nГолосование завершится через {время} минут")
     for i in range(len(options)):
         await poll_message.add_reaction(f"{i+1}\u20e3")
 
@@ -439,7 +439,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     for reaction in poll_message.reactions:
         results[reaction.emoji] = reaction.count - 1
 
-    result_str = f"**Результаты голосования на вопрос '{вопрос}'**\n\n"
+    result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
         result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
 
