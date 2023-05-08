@@ -429,22 +429,29 @@ async def bump(ctx):
 async def poll(ctx: SlashContext, вопрос: str, варианты: str, время: float):
     options = варианты.split(",")
     option_str = ""
+    vote_count = [0] * len(options)
     for i in range(len(options)):
         option_str += f"{i+1}. {options[i]}\n"
     poll_message = await ctx.send(f"**Голосование!**\n\n{вопрос}\n\n{option_str}\nГолосование завершится через {время} минут")
     for i in range(len(options)):
-        await poll_message.add_reaction(f"{i+1}\u20e3")
+        await poll_message.add_reaction(f"{i + 1}\u20e3")
+        vote_count[i] = 0
 
     await asyncio.sleep(время*60)
 
     poll_message = await ctx.channel.fetch_message(poll_message.id)
     results = {}
-    for reaction in poll_message.reactions:
-        results[reaction.emoji] = reaction.count - 1
+    max_votes = max(vote_count)
+    max_vote_indices = [i for i, count in enumerate(vote_count) if count == max_votes]
+    winner_index = random.choice(max_vote_indices) if len(max_vote_indices) > 1 else max_vote_indices[0]
 
     result_str = f"**Результаты голосования «{вопрос}»**\n\n"
     for i in range(len(options)):
-        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
+        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], vote_count[i])
+    if len(max_vote_indices) == 1:
+        result_str += f"\nПобедитель голосования: {options[winner_index]}"
+    else:
+        result_str += f"\nНичья! Победитель голосования выбран рандомно: {options[winner_index]}"
 
     await ctx.send(result_str)
     await poll_message.delete()
