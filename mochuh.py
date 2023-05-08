@@ -430,7 +430,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
         option_str += f"{i+1}. {options[i]}\n"
     poll_message = await ctx.send(f"**Голосование**: {вопрос}\n\n{option_str}")
     for i in range(len(options)):
-        await poll_message.add_reaction(f"{i+1}\U0001f1e6")
+        await poll_message.add_reaction(f"{i+1}\u20e3")
 
     await asyncio.sleep(время*60)
 
@@ -441,10 +441,11 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
 
     result_str = "**Результаты голосования:**\n"
     for i in range(len(options)):
-        result_str += f"{i+1}. {options[i]} - {results.get(f'{i+1}\U0001f1e6', 0)} голосов\n"
+        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get("{}\\u20e3".format(i + 1), 0))
 
     await ctx.send(result_str)
     await poll_message.delete()
 
 
 bot.run(token)
+
