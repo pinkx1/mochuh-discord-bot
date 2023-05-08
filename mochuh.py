@@ -1,10 +1,6 @@
 import random
 import os
 import discord
-from discord import message
-from discord.ext import commands
-from discord_slash.utils.manage_commands import create_choice, create_option
-from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow, create_button
 from dotenv import load_dotenv
 import asyncio
 import asyncpg
@@ -13,11 +9,7 @@ import datetime
 from datetime import datetime, timedelta
 import Bumper
 from discord.ext import commands
-from discord_slash import cog_ext, SlashContext, SlashCommand
-from discord_components import DiscordComponents, Button, ButtonStyle
-
-# Создание кнопок
-button1 = Button(style=ButtonStyle.blue, label="Кнопка 1", id="button1")
+from discord_slash import SlashContext, SlashCommand
 
 
 load_dotenv()
