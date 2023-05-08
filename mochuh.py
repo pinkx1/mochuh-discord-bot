@@ -6,7 +6,7 @@ import asyncio
 import asyncpg
 from typing import List
 import datetime
-from datetime import datetime, timedelta
+from datetime import datetime
 import Bumper
 from discord.ext import commands
 from discord_slash import SlashContext, SlashCommand
@@ -185,7 +185,6 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     print('Bot connected')
-    DiscordComponents(bot)
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('приколы'))
     global connection
     connection = await connect_to_db()
