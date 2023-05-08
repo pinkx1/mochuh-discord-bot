@@ -1,8 +1,10 @@
 import random
 import os
 import discord
+from discord import message
 from discord.ext import commands
-from discord_slash import SlashCommand, SlashContext
+from discord_slash.utils.manage_commands import create_choice, create_option
+from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow, create_button
 from dotenv import load_dotenv
 import asyncio
 import asyncpg
@@ -10,6 +12,13 @@ from typing import List
 import datetime
 from datetime import datetime, timedelta
 import Bumper
+from discord.ext import commands
+from discord_slash import cog_ext, SlashContext, SlashCommand
+from discord_components import DiscordComponents, Button, ButtonStyle
+
+# Создание кнопок
+button1 = Button(style=ButtonStyle.blue, label="Кнопка 1", id="button1")
+
 
 load_dotenv()
 token = os.getenv('token')
@@ -184,6 +193,7 @@ async def on_command_error(ctx, error):
 @bot.event
 async def on_ready():
     print('Bot connected')
+    DiscordComponents(bot)
     await bot.change_presence(status=discord.Status.online, activity=discord.Game('приколы'))
     global connection
     connection = await connect_to_db()
@@ -396,6 +406,34 @@ async def bump(ctx):
     
     emoji = discord.utils.get(bot.emojis, name='EZ')
     await ctx.send('Бампнул тредю ' + str(emoji))
+
+
+@slash.slash(
+    name="Голосование",
+    description="Создает голосование",
+    options=[
+        {
+            "name": "вопрос",
+            "description": "Введите ваш вопрос",
+            "type": 3,
+            "required": True
+        },
+        {
+            "name": "варианты",
+            "description": "Введите варианты ответа, разделяя их символом $",
+            "type": 3,
+            "required": True
+        }
+    ]
+)
+async def poll(ctx: SlashContext, вопрос: str, варианты: str):
+    options = варианты.split("$")
+    option_str = ""
+    for i in range(len(options)):
+        option_str += f"{i+1}. {options[i]}\n"
+    poll_message = await ctx.send(f"**Голосование**: {вопрос}\n{option_str}")
+    for i in range(len(options)):
+        await poll_message.add_reaction(f"{i+1}\u20e3")
 
 
 bot.run(token)
