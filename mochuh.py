@@ -424,11 +424,11 @@ async def bump(ctx):
     ]
 )
 async def poll(ctx: SlashContext, вопрос: str, варианты: str, время: float):
-    options = варианты.split("$")
+    options = варианты.split(",")
     option_str = ""
     for i in range(len(options)):
         option_str += f"{i+1}. {options[i]}\n"
-    poll_message = await ctx.send(f"**Голосование**: {вопрос}\n\n{option_str}")
+    poll_message = await ctx.send(f"**Голосование!**:\n {вопрос}\n\n{option_str}")
     for i in range(len(options)):
         await poll_message.add_reaction(f"{i+1}\u20e3")
 
@@ -439,7 +439,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     for reaction in poll_message.reactions:
         results[reaction.emoji] = reaction.count - 1
 
-    result_str = "**Результаты голосования:**\n"
+    result_str = "**Результаты голосования:**\n\n"
     for i in range(len(options)):
         result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get("{}\\u20e3".format(i + 1), 0))
 
