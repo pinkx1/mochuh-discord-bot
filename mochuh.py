@@ -411,20 +411,40 @@ async def bump(ctx):
         },
         {
             "name": "варианты",
-            "description": "Введите варианты ответа, разделяя их символом $",
+            "description": "Введите варианты ответа, разделяя их запятой",
             "type": 3,
+            "required": True
+        },
+        {
+            "name": "время",
+            "description": "Введите время (в минутах) для завершения голосования",
+            "type": 10,
             "required": True
         }
     ]
 )
-async def poll(ctx: SlashContext, вопрос: str, варианты: str):
-    options = варианты.split("$")
+async def poll(ctx: SlashContext, вопрос: str, варианты: str, время: float):
+    options = варианты.split(",")
     option_str = ""
     for i in range(len(options)):
         option_str += f"{i+1}. {options[i]}\n"
     poll_message = await ctx.send(f"**Голосование**: {вопрос}\n\n{option_str}")
     for i in range(len(options)):
         await poll_message.add_reaction(f"{i+1}\u20e3")
+
+    await asyncio.sleep(время*60)
+
+    poll_message = await ctx.channel.fetch_message(poll_message.id)
+    results = {}
+    for reaction in poll_message.reactions:
+        results[reaction.emoji] = reaction.count - 1
+
+    result_str = "**Результаты голосования:**\n"
+    for i in range(len(options)):
+        result_str += f"{i+1}. {options[i]} - {results.get(f'{i+1}\u20e3', 0)} голосов\n"
+
+    await ctx.send(result_str)
+    await poll_message.delete()
 
 
 bot.run(token)
