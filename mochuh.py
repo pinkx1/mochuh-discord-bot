@@ -441,7 +441,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
 
     result_str = "**Результаты голосования:**\n\n"
     for i in range(len(options)):
-        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get("{}\\u20e3".format(i + 1), 0))
+        result_str += "{}. {} - {} голосов\n".format(i + 1, options[i], results.get(f"{i+1}\u20e3", 0))
 
     await ctx.send(result_str)
     await poll_message.delete()
