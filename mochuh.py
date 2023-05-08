@@ -447,7 +447,6 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
 
     emoji_ez = discord.utils.get(bot.emojis, name='EZ')
     emoji_retarded_ez = discord.utils.get(bot.emojis, name='pepeBasedge')
-    await ctx.send('Бампнул тредю ' + str(emoji_ez))
 
     winners = [option for option, votes in results.items() if votes == max_votes]
     winner_str = ""
