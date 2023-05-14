@@ -437,7 +437,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
         await poll_message.add_reaction(f"{i + 1}\u20e3")
         vote_count[i] = 0
 
-    await asyncio.sleep(время)*60
+    await asyncio.sleep(время*60)
 
     poll_message = await ctx.channel.fetch_message(poll_message.id)
     results = {}
