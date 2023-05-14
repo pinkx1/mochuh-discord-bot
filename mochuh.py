@@ -426,7 +426,7 @@ async def bump(ctx):
         }
     ]
 )
-async def poll(ctx: SlashContext, вопрос: str, варианты: str, время: float):
+async def poll(ctx: SlashContext, вопрос: str, варианты: str, время: int):
     options = варианты.split(",")
     option_str = ""
     vote_count = [0] * len(options)
