@@ -463,7 +463,7 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     await poll_message.delete()
 
 
-@bot.command(aliases=['не срать'])
+@bot.command(aliases=['не'])
 async def nesrat(ctx):
     await ctx.channel.purge(limit=1)
     emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
