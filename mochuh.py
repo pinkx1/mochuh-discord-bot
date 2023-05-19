@@ -10,6 +10,8 @@ from datetime import datetime
 import Bumper
 from discord.ext import commands
 from discord_slash import SlashContext, SlashCommand, cog_ext
+import requests
+import openai
 from discord_slash.utils.manage_components import create_button, create_actionrow
 from discord_slash.model import ButtonStyle
 from discord_slash.utils import manage_components
@@ -37,7 +39,8 @@ no_bot_reaction_channels = [973593062045548636,
                             1038853570159714464,
                             1064961124153438339,
                             1085563045020975256,
-                            1102235103008149544]
+                            1102235103008149544,
+                            1109067479185100860]
 
 
 async def connect_to_db():
@@ -463,12 +466,40 @@ async def poll(ctx: SlashContext, вопрос: str, варианты: str, вр
     await poll_message.delete()
 
 
-@bot.command(aliases=['не'])
-async def nesrat(ctx):
-    await ctx.channel.purge(limit=1)
-    emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
-    emoji3 = discord.utils.get(bot.emojis, name='nonono')
-    await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
+# @bot.command(aliases=['не'])
+# async def nesrat(ctx):
+#     await ctx.channel.purge(limit=1)
+#     emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
+#     emoji3 = discord.utils.get(bot.emojis, name='nonono')
+#     await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
+#
+#
+# @slash.slash(name="generate_image", description="Сгенерировать картинку")
+# async def generate_image(ctx, prompt: str):
+#     generated_image = generate_image(prompt)
+#     await ctx.send(file=discord.File(generated_image, 'image.png'))
+#
+#
+# def generate_image(prompt):
+#     ai_token = os.getenv('ai_token')
+#     openai.api_key = ai_token
+#
+#     response = openai.Image.create(
+#         prompt=prompt,
+#         n=1,
+#         size="1024x1024"
+#     )
+#
+#     image_url = response['data'][0]['url']
+#
+#     # Загрузка изображения и сохранение на диск
+#     response = requests.get(image_url)
+#     response.raise_for_status()
+#
+#     with open('generated_image.png', 'wb') as f:
+#         f.write(response.content)
+#
+#     return 'generated_image.png'
 
 
 bot.run(token)
