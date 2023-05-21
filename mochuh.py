@@ -193,9 +193,14 @@ async def on_ready():
 
 @commands.has_permissions(administrator=True)
 @bot.command()
-async def say(ctx, *, arg):
+async def say(ctx, *, message):
     await ctx.channel.purge(limit=1)
-    await ctx.send(arg)
+    if len(ctx.message.attachments) > 0:
+        attachment = ctx.message.attachments[0]
+        image = await attachment.to_file()
+        await ctx.send(message, file=image)
+    else:
+        await ctx.send(message)
 
 
 @slash.slash(description="Лобби SiGame")
