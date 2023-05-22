@@ -193,12 +193,11 @@ async def on_ready():
 
 @commands.has_permissions(administrator=True)
 @bot.command()
-async def say(ctx, *, message):
+async def say(ctx, *, message=None):
     await ctx.channel.purge(limit=1)
     if len(ctx.message.attachments) > 0:
         attachment = ctx.message.attachments[0]
-        image = await attachment.to_file()
-        await ctx.send(message, file=image)
+        await ctx.send(message or "", file=await attachment.to_file())
     else:
         await ctx.send(message)
 
