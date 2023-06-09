@@ -334,6 +334,12 @@ async def on_message(message):
     check_spam_list()
 
 
+@bot.command(aliases=['не'])
+async def nesrat(ctx):
+    await ctx.channel.purge(limit=1)
+    emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
+
+
 @bot.event
 async def on_raw_reaction_add(payload):
     message_id = payload.message_id
