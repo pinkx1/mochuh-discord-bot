@@ -246,18 +246,18 @@ async def coinflip(ctx):
     await ctx.send(random.choice(['Орел', 'Решка']))
 
 
-@bot.event
-async def on_member_join(member):
-    channel = bot.get_channel(1085563045020975256)
-    emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
-    emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
-
-    async def send_greeting():
-        await asyncio.sleep(3)
-        await channel.send(
-            f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
-
-    asyncio.create_task(send_greeting())
+# @bot.event
+# async def on_member_join(member):
+#     channel = bot.get_channel(1085563045020975256)
+#     emoji_pepe_basedge = discord.utils.get(bot.emojis, name='pepeBasedge')
+#     emoji_nonono = discord.utils.get(bot.emojis, name='nonono')
+#
+#     async def send_greeting():
+#         await asyncio.sleep(3)
+#         await channel.send(
+#             f"{member.mention} привет! Для того, чтобы получить доступ к основному чату, тебе нужно побалакать с кем-нибудь из модеров {emoji_pepe_basedge}{emoji_nonono}")
+#
+#     asyncio.create_task(send_greeting())
 
 
 @bot.event
