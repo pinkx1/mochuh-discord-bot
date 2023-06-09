@@ -338,6 +338,8 @@ async def on_message(message):
 async def nesrat(ctx):
     await ctx.channel.purge(limit=1)
     emoji2 = discord.utils.get(bot.emojis, name='pepeBasedge')
+    emoji3 = discord.utils.get(bot.emojis, name='nonono')
+    await ctx.send(str(emoji2) + str(emoji3) + ' НЕ СРАТЬ')
 
 
 @bot.event
