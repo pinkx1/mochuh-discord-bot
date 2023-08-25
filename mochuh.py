@@ -56,53 +56,53 @@ async def connect_to_db():
         print("Error while connecting to PostgreSQL", error)
 
 
-async def check_achievement(discord_id: int, message_count: int, message):
-    if message_count >= 2000:
-        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
-                                                                    "FROM achievements "
-                                                                    "WHERE discord_id = $1 "
-                                                                    "AND achievement_name = 'Спейсователь'", discord_id)
+# async def check_achievement(discord_id: int, message_count: int, message):
+#     if message_count >= 2000:
+#         existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
+#                                                                     "FROM achievements "
+#                                                                     "WHERE discord_id = $1 "
+#                                                                     "AND achievement_name = 'Спейсователь'", discord_id)
+#
+#         if existing_achievement_spacemaker == 0:
+#             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+#                                      "VALUES ($1, 'Спейсователь')", discord_id)
+#             user = bot.get_user(discord_id)
+#             channel = bot.get_channel(1034698950369874010)
+#             await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
+#
+#     if message_count >= 10000:
+#         existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
+#                                                                     "FROM achievements "
+#                                                                     "WHERE discord_id = $1 "
+#                                                                     "AND achievement_name = 'Архивариус 📚'", discord_id)
+#
+#         if existing_achievement_spacemaker == 0:
+#             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+#                                      "VALUES ($1, 'Архивариус 📚')", discord_id)
+#             user = bot.get_user(discord_id)
+#             channel = bot.get_channel(1034698950369874010)
+#             await channel.send(f"{user.mention} получил ачивку «Архивариус 📚» за 10000 сообщений на сервере!")
+#
+#     if 'получка' in message.content.lower():
+#         existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
+#                                                                   "FROM achievements "
+#                                                                   "WHERE discord_id = $1 "
+#                                                                   "AND achievement_name = 'Прадед'", discord_id)
+#
+#         if existing_achievement_poluchka == 0:
+#             await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
+#                                      "VALUES ($1, 'Прадед')", discord_id)
+#             user = bot.get_user(discord_id)
+#             channel = bot.get_channel(1034698950369874010)
+#             await channel.send(f"{user.mention} получил ачивку «Прадед»")
 
-        if existing_achievement_spacemaker == 0:
-            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
-                                     "VALUES ($1, 'Спейсователь')", discord_id)
-            user = bot.get_user(discord_id)
-            channel = bot.get_channel(1034698950369874010)
-            await channel.send(f"{user.mention} получил ачивку «Спейсователь» за 2000 сообщений на сервере!")
-    
-    if message_count >= 10000:
-        existing_achievement_spacemaker = await connection.fetchval("SELECT COUNT(*) "
-                                                                    "FROM achievements "
-                                                                    "WHERE discord_id = $1 "
-                                                                    "AND achievement_name = 'Архивариус 📚'", discord_id)
 
-        if existing_achievement_spacemaker == 0:
-            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
-                                     "VALUES ($1, 'Архивариус 📚')", discord_id)
-            user = bot.get_user(discord_id)
-            channel = bot.get_channel(1034698950369874010)
-            await channel.send(f"{user.mention} получил ачивку «Архивариус 📚» за 10000 сообщений на сервере!")
-
-    if 'получка' in message.content.lower():
-        existing_achievement_poluchka = await connection.fetchval("SELECT COUNT(*) "
-                                                                  "FROM achievements "
-                                                                  "WHERE discord_id = $1 "
-                                                                  "AND achievement_name = 'Прадед'", discord_id)
-
-        if existing_achievement_poluchka == 0:
-            await connection.execute("INSERT INTO achievements (discord_id, achievement_name) "
-                                     "VALUES ($1, 'Прадед')", discord_id)
-            user = bot.get_user(discord_id)
-            channel = bot.get_channel(1034698950369874010)
-            await channel.send(f"{user.mention} получил ачивку «Прадед»")
-
-
-async def get_achievements(discord_id) -> List[str]:
-    query = 'SELECT achievement_name ' \
-            'FROM achievements ' \
-            'WHERE discord_id = $1'
-    achievements = await connection.fetch(query, discord_id)
-    return [a["achievement_name"] for a in achievements]
+# async def get_achievements(discord_id) -> List[str]:
+#     query = 'SELECT achievement_name ' \
+#             'FROM achievements ' \
+#             'WHERE discord_id = $1'
+#     achievements = await connection.fetch(query, discord_id)
+#     return [a["achievement_name"] for a in achievements]
 
 
 async def get_message_count(discord_id):
@@ -230,16 +230,16 @@ async def messages_count(ctx):
 
 
 # @bot.command(name='ачивки')
-@slash.slash(description="Твои ачивки")
-async def achievements(ctx):
-    author = ctx.author
-    discord_id = author.id
-    achievements = await get_achievements(discord_id)
-    if achievements:
-        achievement_list = "\n".join(achievements)
-        await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
-    else:
-        await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
+# @slash.slash(description="Твои ачивки")
+# async def achievements(ctx):
+#     author = ctx.author
+#     discord_id = author.id
+#     achievements = await get_achievements(discord_id)
+#     if achievements:
+#         achievement_list = "\n".join(achievements)
+#         await ctx.send(f'{author.mention}, ваши ачивки:\n{achievement_list}')
+#     else:
+#         await ctx.send(f'{author.mention}, у вас пока нет ачивок =(')
 
 
 @slash.slash(description="Бросить монетку")
@@ -327,7 +327,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
     message_count = await get_message_count(user_id)
-    await check_achievement(user_id, message_count, message)
+    # await check_achievement(user_id, message_count, message)
 
     exp = random.randint(5, 15)
     await add_exp(exp, user_id)
