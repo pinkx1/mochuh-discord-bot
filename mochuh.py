@@ -64,7 +64,7 @@ async def get_message_count(discord_id):
     return result
 
 
-allowed_users = [417432559086206977, 144749098795270144]
+allowed_users = [417432559086206977]
 
 
 @slash.slash(
@@ -80,7 +80,6 @@ allowed_users = [417432559086206977, 144749098795270144]
     ]
 )
 async def clear(ctx: SlashContext, amount: int):
-    """Удаляет последние amount сообщений в текущем канале"""
     if ctx.author.id in allowed_users:
         await ctx.channel.purge(limit=amount)
         await asyncio.sleep(1)
